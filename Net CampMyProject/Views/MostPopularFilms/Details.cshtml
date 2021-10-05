@@ -1,0 +1,159 @@
+﻿@using Net_CampMyProject.Data.Models
+@model Net_CampMyProject.Data.Models.MostPopularFilm
+
+@{
+    ViewData["Title"] = $"{Model.FullTitle} - Details";
+
+    var isAdmin = User.IsInRole(Roles.Admin);
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Rank)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Rank)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.RankUpDown)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.RankUpDown)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FullTitle)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FullTitle)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Year)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Year)
+        </dd>
+        @*<dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ImageUrl)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ImageUrl)
+        </dd>*@
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Crew)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Crew)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ImDbRating)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ImDbRating)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ImDbRatingCount)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ImDbRatingCount)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TrailerUrl)
+        </dt>
+        
+        @if (!string.IsNullOrEmpty(Model.TrailerUrl))
+        {
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.TrailerUrl)
+            </dd>
+            <dd class="col-sm-10">
+                <iframe src="@Model.TrailerUrl" width="1000" height="480" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" frameborder="no" scrolling="no"></iframe>
+            </dd>
+        }
+        
+    </dl>
+</div>
+
+@if (isAdmin)
+{
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.ImbId">Edit</a> |
+        <a asp-action="Index">Back to List</a>
+    </div>
+}
+
+<h4>Add Comment Form</h4>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" asp-controller="Comments">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input hidden="hidden" name="@nameof(Comment.FilmId)" value="@Model.ImbId" class="form-control" />
+            
+            <div class="form-group">
+                <label for="@nameof(Comment.Content)" class="control-label"></label>
+                <input name="@nameof(Comment.Content)" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-danger" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<h2>Comments</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            @if (isAdmin)
+            {
+                <th></th>
+            }
+            <th>
+                DateTime
+            </th>
+            <th>
+                Author
+            </th>
+            <th>
+                Content
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Comments.OrderByDescending(c => c.DateTime).Take(10))
+        {
+            <tr>
+                @if (isAdmin)
+                {
+                    <td>
+                        <a asp-action="Edit" asp-controller="Comments" asp-route-id="@item.Id">E</a> |
+                        <a asp-action="Details" asp-controller="Comments" asp-route-id="@item.Id">D</a> |
+                        <a asp-action="Delete" asp-controller="Comments" asp-route-id="@item.Id">R</a>
+                    </td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Author.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Content)
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>

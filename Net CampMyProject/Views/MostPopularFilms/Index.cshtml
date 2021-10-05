@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Net_CampMyProject.Models.ViewModels.FimViewModel>
+
+@{
+    ViewData["Title"] = "Most Popular Films";
+
+    var isAdmin = User.IsInRole(Roles.Admin);
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>       
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.ActionLink("Rank", "Index", new { sortBy = "Rank", sortOrder = ViewBag.SortOrder })
+            </th>
+            <th>
+                @Html.ActionLink("Title", "Index", new { sortBy = "Title", sortOrder = ViewBag.SortOrder })
+            </th>
+            <th>
+                @Html.ActionLink("FullTitle", "Index", new { sortBy = "FullTitle", sortOrder = ViewBag.SortOrder })
+            </th>
+            <th>
+                @Html.ActionLink("Year", "Index", new { sortBy = "Year", sortOrder = ViewBag.SortOrder })
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Crew)
+            </th>
+            <th>
+                @Html.ActionLink("ImDbRating", "Index", new { sortBy = "ImDbRating", sortOrder = ViewBag.SortOrder })
+            </th>
+            @if (isAdmin)
+            {
+                <th></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Rank)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.ImbId">@item.Title</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FullTitle)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Year)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Crew)
+
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ImDbRating)
+                </td>
+                <td>
+                    @if (isAdmin)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.ImbId" class="ml-1">E</a>
+                        <a asp-action="Delete" asp-route-id="@item.ImbId" class="ml-1">R</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

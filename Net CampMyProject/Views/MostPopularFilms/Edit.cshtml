@@ -1,0 +1,74 @@
+﻿@model Net_CampMyProject.Data.Models.MostPopularFilm
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>MostPopularFilm</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ImbId" />
+            <div class="form-group">
+                <label asp-for="Rank" class="control-label"></label>
+                <input asp-for="Rank" class="form-control" />
+                <span asp-validation-for="Rank" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RankUpDown" class="control-label"></label>
+                <input asp-for="RankUpDown" class="form-control" />
+                <span asp-validation-for="RankUpDown" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FullTitle" class="control-label"></label>
+                <input asp-for="FullTitle" class="form-control" />
+                <span asp-validation-for="FullTitle" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Year" class="control-label"></label>
+                <input asp-for="Year" class="form-control" />
+                <span asp-validation-for="Year" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImageUrl" class="control-label"></label>
+                <input asp-for="ImageUrl" class="form-control" />
+                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Crew" class="control-label"></label>
+                <input asp-for="Crew" class="form-control" />
+                <span asp-validation-for="Crew" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImDbRating" class="control-label"></label>
+                <input asp-for="ImDbRating" class="form-control" />
+                <span asp-validation-for="ImDbRating" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImDbRatingCount" class="control-label"></label>
+                <input asp-for="ImDbRatingCount" class="form-control" />
+                <span asp-validation-for="ImDbRatingCount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
