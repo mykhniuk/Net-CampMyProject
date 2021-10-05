@@ -12,7 +12,6 @@ using Net_CampMyProject.Models;
 
 namespace Net_CampMyProject.Controllers
 {
-    
     public class CommentsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -37,18 +36,15 @@ namespace Net_CampMyProject.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var comment = await _context.Comments
                 .Include(c => c.Author)
                 .Include(c => c.Film)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (comment == null)
-            {
                 return NotFound();
-            }
 
             return View(comment);
         }
@@ -57,10 +53,17 @@ namespace Net_CampMyProject.Controllers
         [Authorize(Roles = Roles.Admin)]
         public IActionResult Create()
         {
-            ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id");
-            ViewData["FilmId"] = new SelectList(_context.Films, "ImbId", "ImbId");
+            InitializeSelectLists();
+
             return View();
         }
+
+        private void InitializeSelectLists()
+        {
+            ViewData[nameof(Comment.AuthorId)] = new SelectList(_context.Users, nameof(IdentityUser.Id), nameof(IdentityUser.UserName));
+            ViewData[nameof(Comment.FilmId)] = new SelectList(_context.Films, nameof(MostPopularFilm.ImbId), nameof(MostPopularFilm.FullTitle));
+        }
+
 
         // POST: Comments/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -81,8 +84,7 @@ namespace Net_CampMyProject.Controllers
                 return RedirectToAction(nameof(Details), "MostPopularFilms", new {id = comment.FilmId});
             }
 
-            ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-            ViewData["FilmId"] = new SelectList(_context.Films, "ImbId", "ImbId", comment.FilmId);
+            InitializeSelectLists();
 
             return View(comment);
         }
@@ -92,17 +94,14 @@ namespace Net_CampMyProject.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var comment = await _context.Comments.FindAsync(id);
             if (comment == null)
-            {
                 return NotFound();
-            }
-            ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-            ViewData["FilmId"] = new SelectList(_context.Films, "ImbId", "ImbId", comment.FilmId);
+
+            InitializeSelectLists();
+
             return View(comment);
         }
 
@@ -112,7 +111,7 @@ namespace Net_CampMyProject.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,DateTime,Content,FilmId,AuthorId")] Comment comment)
+        public async Task<IActionResult> Edit(int id, Comment comment)
         {
             if (id != comment.Id)
             {
@@ -129,18 +128,14 @@ namespace Net_CampMyProject.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!CommentExists(comment.Id))
-                    {
                         return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id", comment.AuthorId);
-            ViewData["FilmId"] = new SelectList(_context.Films, "ImbId", "ImbId", comment.FilmId);
+
+            InitializeSelectLists();
+
             return View(comment);
         }
 
@@ -149,18 +144,15 @@ namespace Net_CampMyProject.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var comment = await _context.Comments
                 .Include(c => c.Author)
                 .Include(c => c.Film)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (comment == null)
-            {
                 return NotFound();
-            }
 
             return View(comment);
         }
