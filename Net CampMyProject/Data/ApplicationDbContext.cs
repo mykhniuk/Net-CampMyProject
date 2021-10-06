@@ -11,7 +11,7 @@ namespace Net_CampMyProject.Data
         {
         }
 
-        public DbSet<MostPopularFilm> Films { get; set; }
+        public DbSet<Film> Films { get; set; }
 
         public DbSet<Comment> Comments { get; set; }
     }

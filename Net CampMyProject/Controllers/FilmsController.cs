@@ -12,17 +12,17 @@ using Net_CampMyProject.Models.ViewModels;
 namespace Net_CampMyProject.Controllers
 {
     
-    public class MostPopularFilmsController : Controller
+    public class FilmsController : Controller
     {
         private readonly ApplicationDbContext _db;
 
-        public MostPopularFilmsController(ApplicationDbContext db)
+        public FilmsController(ApplicationDbContext db)
         {
             _db = db;
         }
 
         // GET: MostPopularFilms
-        public async Task<IActionResult> Index(string sortBy = nameof(MostPopularFilm.ImbId), SortOrder sortOrder = SortOrder.Ascending, int takeCount = 10)
+        public async Task<IActionResult> Index(string sortBy = nameof(Film.ImbId), SortOrder sortOrder = SortOrder.Ascending, int takeCount = 10)
         {
             var filmsQuery = _db.Films.AsNoTracking().Select(f => new FimViewModel
             {
@@ -42,11 +42,11 @@ namespace Net_CampMyProject.Controllers
 
             filmsQuery = sortBy switch
             {
-                nameof(MostPopularFilm.Rank) => isDesc ? filmsQuery.OrderByDescending(s => s.Rank) : filmsQuery.OrderBy(s => s.Rank),
-                nameof(MostPopularFilm.Title) => isDesc ? filmsQuery.OrderByDescending(s => s.Title) : filmsQuery.OrderBy(s => s.Title),
-                nameof(MostPopularFilm.FullTitle) => isDesc ? filmsQuery.OrderByDescending(s => s.FullTitle) : filmsQuery.OrderBy(s => s.FullTitle),
-                nameof(MostPopularFilm.Year) => isDesc ? filmsQuery.OrderByDescending(s => s.Year) : filmsQuery.OrderBy(s => s.Year),
-                nameof(MostPopularFilm.ImDbRating) => isDesc ? filmsQuery.OrderByDescending(s => s.ImDbRating) : filmsQuery.OrderBy(s => s.ImDbRating),
+                nameof(Film.Rank) => isDesc ? filmsQuery.OrderByDescending(s => s.Rank) : filmsQuery.OrderBy(s => s.Rank),
+                nameof(Film.Title) => isDesc ? filmsQuery.OrderByDescending(s => s.Title) : filmsQuery.OrderBy(s => s.Title),
+                nameof(Film.FullTitle) => isDesc ? filmsQuery.OrderByDescending(s => s.FullTitle) : filmsQuery.OrderBy(s => s.FullTitle),
+                nameof(Film.Year) => isDesc ? filmsQuery.OrderByDescending(s => s.Year) : filmsQuery.OrderBy(s => s.Year),
+                nameof(Film.ImDbRating) => isDesc ? filmsQuery.OrderByDescending(s => s.ImDbRating) : filmsQuery.OrderBy(s => s.ImDbRating),
                 _ => isDesc ? filmsQuery.OrderByDescending(s => s.ImbId) : filmsQuery.OrderBy(s => s.ImbId)
             };
 
@@ -84,7 +84,7 @@ namespace Net_CampMyProject.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> Create(MostPopularFilm film)
+        public async Task<IActionResult> Create(Film film)
         {
             if (ModelState.IsValid)
             {
@@ -119,7 +119,7 @@ namespace Net_CampMyProject.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> Edit(string id, MostPopularFilm film)
+        public async Task<IActionResult> Edit(string id, Film film)
         {
             if (id != film.ImbId)
                 return NotFound();

@@ -61,7 +61,7 @@ namespace Net_CampMyProject.Controllers
         private void InitializeSelectLists()
         {
             ViewData[nameof(Comment.AuthorId)] = new SelectList(_context.Users, nameof(IdentityUser.Id), nameof(IdentityUser.UserName));
-            ViewData[nameof(Comment.FilmId)] = new SelectList(_context.Films, nameof(MostPopularFilm.ImbId), nameof(MostPopularFilm.FullTitle));
+            ViewData[nameof(Comment.FilmId)] = new SelectList(_context.Films, nameof(Film.ImbId), nameof(Film.FullTitle));
         }
 
 
@@ -81,7 +81,7 @@ namespace Net_CampMyProject.Controllers
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction(nameof(Details), "MostPopularFilms", new {id = comment.FilmId});
+                return RedirectToAction(nameof(Details), "Films", new {id = comment.FilmId});
             }
 
             InitializeSelectLists();

@@ -217,7 +217,7 @@ namespace Net_CampMyProject.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Net_CampMyProject.Data.Models.MostPopularFilm", b =>
+            modelBuilder.Entity("Net_CampMyProject.Data.Models.Film", b =>
                 {
                     b.Property<string>("ImbId")
                         .HasColumnType("nvarchar(450)");

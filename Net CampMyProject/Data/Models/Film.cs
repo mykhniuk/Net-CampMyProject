@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Net_CampMyProject.Data.Models
 {
-    public class MostPopularFilm
+    public class Film
     {
         [Key]
         public string ImbId { get; set; }

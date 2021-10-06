@@ -243,7 +243,7 @@ namespace Net_CampMyProject.Data.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("Net_CampMyProject.Data.Models.MostPopularFilm", b =>
+            modelBuilder.Entity("Net_CampMyProject.Data.Models.Film", b =>
                 {
                     b.Property<string>("ImbId")
                         .HasColumnType("nvarchar(450)");
@@ -340,7 +340,7 @@ namespace Net_CampMyProject.Data.Migrations
                         .WithMany()
                         .HasForeignKey("AuthorId");
 
-                    b.HasOne("Net_CampMyProject.Data.Models.MostPopularFilm", "Film")
+                    b.HasOne("Net_CampMyProject.Data.Models.Film", "Film")
                         .WithMany("Comments")
                         .HasForeignKey("FilmId");
 
@@ -349,7 +349,7 @@ namespace Net_CampMyProject.Data.Migrations
                     b.Navigation("Film");
                 });
 
-            modelBuilder.Entity("Net_CampMyProject.Data.Models.MostPopularFilm", b =>
+            modelBuilder.Entity("Net_CampMyProject.Data.Models.Film", b =>
                 {
                     b.Navigation("Comments");
                 });

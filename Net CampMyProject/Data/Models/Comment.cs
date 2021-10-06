@@ -14,7 +14,7 @@ namespace Net_CampMyProject.Data.Models
         public string Content { get; set; }
 
         public string FilmId { get; set; }
-        public virtual MostPopularFilm Film { get; set; }
+        public virtual Film Film { get; set; }
 
         public string AuthorId { get; set; }
         public virtual IdentityUser Author { get; set; }

@@ -12,25 +12,25 @@ namespace Net_CampMyProject.Controllers.API
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MostPopularFilmsController : ControllerBase
+    public class FilmsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public MostPopularFilmsController(ApplicationDbContext context)
+        public FilmsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
         // GET: api/MostPopularFilms
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MostPopularFilm>>> GetFilms()
+        public async Task<ActionResult<IEnumerable<Film>>> GetFilms()
         {
             return await _context.Films.ToListAsync();
         }
 
         // GET: api/MostPopularFilms/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<MostPopularFilm>> GetMostPopularFilm(string id)
+        public async Task<ActionResult<Film>> GetMostPopularFilm(string id)
         {
             var mostPopularFilm = await _context.Films.FindAsync(id);
 
@@ -45,14 +45,14 @@ namespace Net_CampMyProject.Controllers.API
         // PUT: api/MostPopularFilms/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMostPopularFilm(string id, MostPopularFilm mostPopularFilm)
+        public async Task<IActionResult> PutMostPopularFilm(string id, Film film)
         {
-            if (id != mostPopularFilm.ImbId)
+            if (id != film.ImbId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(mostPopularFilm).State = EntityState.Modified;
+            _context.Entry(film).State = EntityState.Modified;
 
             try
             {
@@ -76,16 +76,16 @@ namespace Net_CampMyProject.Controllers.API
         // POST: api/MostPopularFilms
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<MostPopularFilm>> PostMostPopularFilm(MostPopularFilm mostPopularFilm)
+        public async Task<ActionResult<Film>> PostMostPopularFilm(Film film)
         {
-            _context.Films.Add(mostPopularFilm);
+            _context.Films.Add(film);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (MostPopularFilmExists(mostPopularFilm.ImbId))
+                if (MostPopularFilmExists(film.ImbId))
                 {
                     return Conflict();
                 }
@@ -95,7 +95,7 @@ namespace Net_CampMyProject.Controllers.API
                 }
             }
 
-            return CreatedAtAction("GetMostPopularFilm", new { id = mostPopularFilm.ImbId }, mostPopularFilm);
+            return CreatedAtAction("GetMostPopularFilm", new { id = film.ImbId }, film);
         }
 
         // DELETE: api/MostPopularFilms/5
