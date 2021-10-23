@@ -10,7 +10,7 @@ using Net_CampMyProject.Data;
 namespace Net_CampMyProject.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210929191354_MostPopularFilmsController")]
+    [Migration("20210929191354_FilmsController")]
     partial class MostPopularFilmsController
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

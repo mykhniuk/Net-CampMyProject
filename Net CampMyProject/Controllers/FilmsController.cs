@@ -21,18 +21,14 @@ namespace Net_CampMyProject.Controllers
             _db = db;
         }
 
-        // GET: MostPopularFilms
-        public async Task<IActionResult> Index(string sortBy = nameof(Film.ImbId), SortOrder sortOrder = SortOrder.Ascending, int takeCount = 10)
+        // GET: Films
+        public async Task<IActionResult> Index(string sortBy = nameof(Film.Title), SortOrder sortOrder = SortOrder.Ascending, int takeCount = 10)
         {
             var filmsQuery = _db.Films.AsNoTracking().Select(f => new FimViewModel
             {
-                ImbId = f.ImbId,
-                Rank = f.Rank,
+                Id = f.Id,
                 Title = f.Title,
-                FullTitle = f.FullTitle,
-                Year = f.Year,
-                Crew = f.Crew,
-                ImDbRating = f.ImDbRating
+                ReleaseDate = f.ReleaseDate,
             });
 
             if (sortOrder == SortOrder.Unspecified)
@@ -42,12 +38,9 @@ namespace Net_CampMyProject.Controllers
 
             filmsQuery = sortBy switch
             {
-                nameof(Film.Rank) => isDesc ? filmsQuery.OrderByDescending(s => s.Rank) : filmsQuery.OrderBy(s => s.Rank),
                 nameof(Film.Title) => isDesc ? filmsQuery.OrderByDescending(s => s.Title) : filmsQuery.OrderBy(s => s.Title),
-                nameof(Film.FullTitle) => isDesc ? filmsQuery.OrderByDescending(s => s.FullTitle) : filmsQuery.OrderBy(s => s.FullTitle),
-                nameof(Film.Year) => isDesc ? filmsQuery.OrderByDescending(s => s.Year) : filmsQuery.OrderBy(s => s.Year),
-                nameof(Film.ImDbRating) => isDesc ? filmsQuery.OrderByDescending(s => s.ImDbRating) : filmsQuery.OrderBy(s => s.ImDbRating),
-                _ => isDesc ? filmsQuery.OrderByDescending(s => s.ImbId) : filmsQuery.OrderBy(s => s.ImbId)
+                nameof(Film.ReleaseDate) => isDesc ? filmsQuery.OrderByDescending(s => s.ReleaseDate) : filmsQuery.OrderBy(s => s.ReleaseDate),
+                _ => isDesc ? filmsQuery.OrderByDescending(s => s.Title) : filmsQuery.OrderBy(s => s.Title)
             };
 
             ViewBag.SortOrder = isDesc ? SortOrder.Ascending : SortOrder.Descending;
@@ -55,15 +48,12 @@ namespace Net_CampMyProject.Controllers
             return View(await filmsQuery.Take(takeCount).ToListAsync());
         }
 
-        // GET: MostPopularFilms/Details/5
-        public async Task<IActionResult> Details(string id)
+        // GET: Films/Details/5
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-                return NotFound();
-
             var film = await _db.Films.Include(f => f.Comments)
                                           .ThenInclude(c => c.Author)
-                                      .FirstOrDefaultAsync(m => m.ImbId == id);
+                                      .FirstOrDefaultAsync(m => m.Id == id);
 
             if (film == null)
                 return NotFound();
@@ -71,14 +61,14 @@ namespace Net_CampMyProject.Controllers
             return View(film);
         }
 
-        // GET: MostPopularFilms/Create
+        // GET: Films/Create
         [Authorize(Roles = Roles.Admin)]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: MostPopularFilms/Create
+        // POST: Films/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -96,32 +86,32 @@ namespace Net_CampMyProject.Controllers
             return View(film);
         }
 
-        // GET: MostPopularFilms/Edit/5
+        // GET: Films/Edit/5
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(int id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var mostPopularFilm = await _db.Films.FindAsync(id);
-            if (mostPopularFilm == null)
+            var Film = await _db.Films.FindAsync(id);
+            if (Film == null)
             {
                 return NotFound();
             }
-            return View(mostPopularFilm);
+            return View(Film);
         }
 
-        // POST: MostPopularFilms/Edit/5
+        // POST: Films/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> Edit(string id, Film film)
+        public async Task<IActionResult> Edit(int id, Film film)
         {
-            if (id != film.ImbId)
+            if (id != film.Id)
                 return NotFound();
 
             if (ModelState.IsValid)
@@ -134,7 +124,7 @@ namespace Net_CampMyProject.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MostPopularFilmExists(film.ImbId))
+                    if (!FilmExists(film.Id))
                         return NotFound();
 
                     throw;
@@ -146,15 +136,12 @@ namespace Net_CampMyProject.Controllers
             return View(film);
         }
 
-        // GET: MostPopularFilms/Delete/5
+        // GET: Films/Delete/5
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-                return NotFound();
-
             var film = await _db.Films
-                .FirstOrDefaultAsync(m => m.ImbId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (film == null)
                 return NotFound();
@@ -162,11 +149,11 @@ namespace Net_CampMyProject.Controllers
             return View(film);
         }
 
-        // POST: MostPopularFilms/Delete/5
+        // POST: Films/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var film = await _db.Films.FindAsync(id);
             if (film != null)
@@ -178,9 +165,9 @@ namespace Net_CampMyProject.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool MostPopularFilmExists(string id)
+        private bool FilmExists(int id)
         {
-            return _db.Films.Any(e => e.ImbId == id);
+            return _db.Films.Any(e => e.Id == id);
         }
     }
 }

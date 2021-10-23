@@ -1,4 +1,4 @@
-﻿@model Net_CampMyProject.Data.Models.MostPopularFilm
+﻿@model Net_CampMyProject.Data.Models.Film
 
 @{
     ViewData["Title"] = "Create";
@@ -6,61 +6,71 @@
 
 <h1>Create</h1>
 
-<h4>MostPopularFilm</h4>
+<h4>Film</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="ImbId" class="control-label"></label>
-                <input asp-for="ImbId" class="form-control" />
-                <span asp-validation-for="ImbId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Rank" class="control-label"></label>
-                <input asp-for="Rank" class="form-control" />
-                <span asp-validation-for="Rank" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RankUpDown" class="control-label"></label>
-                <input asp-for="RankUpDown" class="form-control" />
-                <span asp-validation-for="RankUpDown" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="FullTitle" class="control-label"></label>
-                <input asp-for="FullTitle" class="form-control" />
-                <span asp-validation-for="FullTitle" class="text-danger"></span>
+                <label asp-for="ImgUrl" class="control-label"></label>
+                <input asp-for="ImgUrl" class="form-control" />
+                <span asp-validation-for="ImgUrl" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Year" class="control-label"></label>
-                <input asp-for="Year" class="form-control" />
-                <span asp-validation-for="Year" class="text-danger"></span>
+                <label asp-for="Duration" class="control-label"></label>
+                <input asp-for="Duration" class="form-control" />
+                <span asp-validation-for="Duration" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ImageUrl" class="control-label"></label>
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                <label asp-for="TrailerUrl" class="control-label"></label>
+                <input asp-for="TrailerUrl" class="form-control" />
+                <span asp-validation-for="TrailerUrl" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Crew" class="control-label"></label>
-                <input asp-for="Crew" class="form-control" />
-                <span asp-validation-for="Crew" class="text-danger"></span>
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ImDbRating" class="control-label"></label>
-                <input asp-for="ImDbRating" class="form-control" />
-                <span asp-validation-for="ImDbRating" class="text-danger"></span>
+                <label asp-for="ReleaseDate" class="control-label"></label>
+                <input asp-for="ReleaseDate" class="form-control" />
+                <span asp-validation-for="ReleaseDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ImDbRatingCount" class="control-label"></label>
-                <input asp-for="ImDbRatingCount" class="form-control" />
-                <span asp-validation-for="ImDbRatingCount" class="text-danger"></span>
+                <label asp-for="Budget" class="control-label"></label>
+                <input asp-for="Budget" class="form-control" />
+                <span asp-validation-for="Budget" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Languages" class="control-label"></label>
+                <input asp-for="Languages" class="form-control" />
+                <span asp-validation-for="Languages" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Awards" class="control-label"></label>
+                <input asp-for="Awards" class="form-control" />
+                <span asp-validation-for="Awards" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Screenplay" class="control-label"></label>
+                <input asp-for="Screenplay" class="form-control" />
+                <span asp-validation-for="Screenplay" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BoxOffice" class="control-label"></label>
+                <input asp-for="BoxOffice" class="form-control" />
+                <span asp-validation-for="BoxOffice" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Nominations" class="control-label"></label>
+                <input asp-for="Nominations" class="form-control" />
+                <span asp-validation-for="Nominations" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

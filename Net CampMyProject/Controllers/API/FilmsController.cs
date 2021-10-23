@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Net_CampMyProject.Data;
@@ -21,33 +19,33 @@ namespace Net_CampMyProject.Controllers.API
             _context = context;
         }
 
-        // GET: api/MostPopularFilms
+        // GET: api/Films
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Film>>> GetFilms()
         {
             return await _context.Films.ToListAsync();
         }
 
-        // GET: api/MostPopularFilms/5
+        // GET: api/Films/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Film>> GetMostPopularFilm(string id)
+        public async Task<ActionResult<Film>> GetFilm(string id)
         {
-            var mostPopularFilm = await _context.Films.FindAsync(id);
+            var Film = await _context.Films.FindAsync(id);
 
-            if (mostPopularFilm == null)
+            if (Film == null)
             {
                 return NotFound();
             }
 
-            return mostPopularFilm;
+            return Film;
         }
 
-        // PUT: api/MostPopularFilms/5
+        // PUT: api/Films/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMostPopularFilm(string id, Film film)
+        public async Task<IActionResult> PutFilm(int id, Film film)
         {
-            if (id != film.ImbId)
+            if (id != film.Id)
             {
                 return BadRequest();
             }
@@ -60,7 +58,7 @@ namespace Net_CampMyProject.Controllers.API
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MostPopularFilmExists(id))
+                if (!FilmExists(id))
                 {
                     return NotFound();
                 }
@@ -73,19 +71,20 @@ namespace Net_CampMyProject.Controllers.API
             return NoContent();
         }
 
-        // POST: api/MostPopularFilms
+        // POST: api/Films
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Film>> PostMostPopularFilm(Film film)
+        public async Task<ActionResult<Film>> PostFilm(Film film)
         {
             _context.Films.Add(film);
+
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (MostPopularFilmExists(film.ImbId))
+                if (FilmExists(film.Id))
                 {
                     return Conflict();
                 }
@@ -95,28 +94,28 @@ namespace Net_CampMyProject.Controllers.API
                 }
             }
 
-            return CreatedAtAction("GetMostPopularFilm", new { id = film.ImbId }, film);
+            return CreatedAtAction("GetFilm", new { id = film.Id }, film);
         }
 
-        // DELETE: api/MostPopularFilms/5
+        // DELETE: api/Films/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMostPopularFilm(string id)
+        public async Task<IActionResult> DeleteFilm(int id)
         {
-            var mostPopularFilm = await _context.Films.FindAsync(id);
-            if (mostPopularFilm == null)
+            var Film = await _context.Films.FindAsync(id);
+            if (Film == null)
             {
                 return NotFound();
             }
 
-            _context.Films.Remove(mostPopularFilm);
+            _context.Films.Remove(Film);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool MostPopularFilmExists(string id)
+        private bool FilmExists(int id)
         {
-            return _context.Films.Any(e => e.ImbId == id);
+            return _context.Films.Any(e => e.Id == id);
         }
 
         

@@ -13,6 +13,14 @@ namespace Net_CampMyProject.Data
 
         public DbSet<Film> Films { get; set; }
 
+        public DbSet<FilmPerson> FilmPersons { get; set; }
+
+        public DbSet<Person> Persons { get; set; }
+
         public DbSet<Comment> Comments { get; set; }
+
+        public DbSet<FilmRating> FilmRatings { get; set; }
+
+        public DbSet<FilmRatingSource> FilmRatingSources { get; set; }
     }
 }

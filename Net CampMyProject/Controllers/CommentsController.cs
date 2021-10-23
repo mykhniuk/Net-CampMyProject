@@ -61,7 +61,7 @@ namespace Net_CampMyProject.Controllers
         private void InitializeSelectLists()
         {
             ViewData[nameof(Comment.AuthorId)] = new SelectList(_context.Users, nameof(IdentityUser.Id), nameof(IdentityUser.UserName));
-            ViewData[nameof(Comment.FilmId)] = new SelectList(_context.Films, nameof(Film.ImbId), nameof(Film.FullTitle));
+            ViewData[nameof(Comment.FilmId)] = new SelectList(_context.Films, nameof(Film.Id), nameof(Film.Id));
         }
 
 
