@@ -13,6 +13,10 @@ namespace Net_CampMyProject.Data.Models
 
         public string ImgUrl { get; set; }
 
+        public string Country { get; set; }
+
+        public string Genre { get; set; }
+
         public string Duration { get; set; }
 
         public string TrailerUrl { get; set; }

@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31702.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Net_CampMyProject", "Net CampMyProject\Net_CampMyProject.csproj", "{608ACC82-74F3-4B35-ABE7-2F52C9619732}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Net_CampMyProject", "Net CampMyProject\Net_CampMyProject.csproj", "{608ACC82-74F3-4B35-ABE7-2F52C9619732}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FilmsParser", "FilmsParser\FilmsParser.csproj", "{9A88DFB5-98A7-43E4-9D6F-2EF4FBA8CA93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{608ACC82-74F3-4B35-ABE7-2F52C9619732}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{608ACC82-74F3-4B35-ABE7-2F52C9619732}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{608ACC82-74F3-4B35-ABE7-2F52C9619732}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A88DFB5-98A7-43E4-9D6F-2EF4FBA8CA93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A88DFB5-98A7-43E4-9D6F-2EF4FBA8CA93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A88DFB5-98A7-43E4-9D6F-2EF4FBA8CA93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A88DFB5-98A7-43E4-9D6F-2EF4FBA8CA93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
