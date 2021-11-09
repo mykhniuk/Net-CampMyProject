@@ -33,7 +33,7 @@ namespace Net_CampMyProject.Controllers
                 return NotFound();
             }
 
-            var person = await _context.Persons
+            var person = await _context.Persons.Include(c=>c.FilmPersons)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (person == null)
             {

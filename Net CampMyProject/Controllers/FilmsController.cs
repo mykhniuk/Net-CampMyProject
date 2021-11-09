@@ -52,7 +52,7 @@ namespace Net_CampMyProject.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var film = await _db.Films.Include(f => f.Comments)
-                                          .ThenInclude(c => c.Author)
+                                      .ThenInclude(c => c.Author).Include(c=>c.Persons).ThenInclude(c=>c.Person)
                                       .FirstOrDefaultAsync(m => m.Id == id);
 
             if (film == null)

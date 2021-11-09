@@ -22,5 +22,9 @@ namespace Net_CampMyProject.Data
         public DbSet<FilmRating> FilmRatings { get; set; }
 
         public DbSet<FilmRatingSource> FilmRatingSources { get; set; }
+
+        public DbSet<Net_CampMyProject.Data.Models.Genre> Genre { get; set; }
+
+        public DbSet<Net_CampMyProject.Data.Models.FilmGenre> FilmGenre { get; set; }
     }
 }

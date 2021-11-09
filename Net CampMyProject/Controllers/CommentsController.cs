@@ -84,6 +84,7 @@ namespace Net_CampMyProject.Controllers
                 return RedirectToAction(nameof(Details), "Films", new {id = comment.FilmId});
             }
 
+            
             InitializeSelectLists();
 
             return View(comment);

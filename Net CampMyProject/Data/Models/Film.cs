@@ -42,5 +42,7 @@ namespace Net_CampMyProject.Data.Models
         public virtual ICollection<Comment> Comments { get; set; }
 
         public virtual ICollection<FilmRating> Ratings { get; set; }
+
+        public virtual ICollection<FilmGenre> Genres { get; set; }
     }
 }

@@ -5,6 +5,9 @@
         Director,
         StoryBy,
         Producer,
-        Cast
+        Cast,
+        ExecutiveProducers,
+        Composer,
+        Screenplay       
     }
 }

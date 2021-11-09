@@ -2,47 +2,68 @@
 
 @{
     ViewData["Title"] = "Details";
+    var isAdmin = User.IsInRole(Roles.Admin);
 }
 
-<h1>Details</h1>
 
 <div>
-    <h4>Person</h4>
+    <h4>@Model.Name</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Name)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Name)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImgUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImgUrl)
-        </dd>
-        <dt class = "col-sm-2">
+        @if (Model.ImgUrl != null)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.ImgUrl)
+            </dt>
+            <dd class="col-sm-10">
+                <img src="@Model.ImgUrl" />
+            </dd>
+        }
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.BirthnIformation)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.BirthnIformation)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Description)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.SocialNetworksLinks)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.SocialNetworksLinks)
         </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SocialNetworksLinks)
+        </dt>
+        @if (Model.SocialNetworksLinks != null)
+        {
+
+            @foreach (var item in Model.SocialNetworksLinks.Split(","))
+            {
+                <dd class="col-sm-10">
+                    <a href=" @item.ToString();">@item.ToString()</a> 
+                </dd>
+            }
+
+        }
+
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if (isAdmin)
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> 
+        }
+    <a asp-action="Details" asp-controller="Films" asp-route-id ="@Model.FilmPersons.FirstOrDefault(c=>c.PersonId == Model.Id).FilmId">Back to Film</a>
 </div>
