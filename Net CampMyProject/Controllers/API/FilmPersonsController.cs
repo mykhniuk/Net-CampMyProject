@@ -78,10 +78,19 @@ namespace Net_CampMyProject.Controllers.API
         [HttpPost]
         public async Task<ActionResult<FilmPerson>> PostFilmPerson(FilmPerson filmPerson)
         {
-            _context.FilmPersons.Add(filmPerson);
-            await _context.SaveChangesAsync();
+            var dbFilmPerson = await _context.FilmPersons
+                .AsNoTracking()
+                .FirstOrDefaultAsync(fp => fp.FilmId == filmPerson.FilmId && fp.PersonId == filmPerson.PersonId && fp.Role == filmPerson.Role);
 
-            return CreatedAtAction("GetFilmPerson", new { id = filmPerson.Id }, filmPerson);
+            if (dbFilmPerson == null)
+            {
+                _context.FilmPersons.Add(filmPerson);
+                await _context.SaveChangesAsync();
+
+                dbFilmPerson = filmPerson;
+            }
+
+            return CreatedAtAction("GetFilmPerson", new { id = dbFilmPerson.Id }, dbFilmPerson);
         }
 
         // DELETE: api/FilmPersons/5

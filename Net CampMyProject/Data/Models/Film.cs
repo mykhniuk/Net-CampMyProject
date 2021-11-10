@@ -13,9 +13,7 @@ namespace Net_CampMyProject.Data.Models
 
         public string ImgUrl { get; set; }
 
-        public string Country { get; set; }
-
-        public string Genre { get; set; }
+        public string Country { get; set; }       
 
         public string Duration { get; set; }
 
@@ -29,9 +27,7 @@ namespace Net_CampMyProject.Data.Models
 
         public string Languages { get; set; }
 
-        public string Awards { get; set; }
-
-        public string Screenplay { get; set; }
+        public string Awards { get; set; }       
 
         public string BoxOffice { get; set; }
 

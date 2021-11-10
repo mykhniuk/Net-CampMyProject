@@ -13,6 +13,6 @@ namespace Net_CampMyProject.Data.Models
 
         public string GenreType { get; set; }
 
-        public virtual ICollection<FilmGenre> Films { get; set; }
+        public virtual ICollection<FilmGenre> FilmGenres { get; set; }
     }
 }

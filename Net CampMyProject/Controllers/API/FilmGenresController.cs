@@ -25,14 +25,14 @@ namespace Net_CampMyProject.Controllers.API
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FilmGenre>>> GetFilmGenre()
         {
-            return await _context.FilmGenre.ToListAsync();
+            return await _context.FilmGenres.ToListAsync();
         }
 
         // GET: api/FilmGenres/5
         [HttpGet("{id}")]
         public async Task<ActionResult<FilmGenre>> GetFilmGenre(int id)
         {
-            var filmGenre = await _context.FilmGenre.FindAsync(id);
+            var filmGenre = await _context.FilmGenres.FindAsync(id);
 
             if (filmGenre == null)
             {
@@ -78,23 +78,32 @@ namespace Net_CampMyProject.Controllers.API
         [HttpPost]
         public async Task<ActionResult<FilmGenre>> PostFilmGenre(FilmGenre filmGenre)
         {
-            _context.FilmGenre.Add(filmGenre);
-            await _context.SaveChangesAsync();
+            var dbFilmGenre = await _context.FilmGenres
+                .AsNoTracking()
+                .FirstOrDefaultAsync(fg => fg.FilmId == filmGenre.FilmId && fg.GenreId == filmGenre.GenreId);
 
-            return CreatedAtAction("GetFilmGenre", new { id = filmGenre.Id }, filmGenre);
+            if (dbFilmGenre == null)
+            {
+                _context.FilmGenres.Add(filmGenre);
+                await _context.SaveChangesAsync();
+
+                dbFilmGenre = filmGenre;
+            }
+
+            return CreatedAtAction("GetFilmGenre", new { id = dbFilmGenre.Id }, dbFilmGenre);
         }
 
         // DELETE: api/FilmGenres/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteFilmGenre(int id)
         {
-            var filmGenre = await _context.FilmGenre.FindAsync(id);
+            var filmGenre = await _context.FilmGenres.FindAsync(id);
             if (filmGenre == null)
             {
                 return NotFound();
             }
 
-            _context.FilmGenre.Remove(filmGenre);
+            _context.FilmGenres.Remove(filmGenre);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -102,7 +111,7 @@ namespace Net_CampMyProject.Controllers.API
 
         private bool FilmGenreExists(int id)
         {
-            return _context.FilmGenre.Any(e => e.Id == id);
+            return _context.FilmGenres.Any(e => e.Id == id);
         }
     }
 }

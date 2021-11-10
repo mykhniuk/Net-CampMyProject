@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Net_CampMyProject.Data;
@@ -25,14 +23,14 @@ namespace Net_CampMyProject.Controllers.API
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Genre>>> GetGenre()
         {
-            return await _context.Genre.ToListAsync();
+            return await _context.Genres.ToListAsync();
         }
 
         // GET: api/Genres/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Genre>> GetGenre(int id)
         {
-            var genre = await _context.Genre.FindAsync(id);
+            var genre = await _context.Genres.FindAsync(id);
 
             if (genre == null)
             {
@@ -78,7 +76,7 @@ namespace Net_CampMyProject.Controllers.API
         [HttpPost]
         public async Task<ActionResult<Genre>> PostGenre(Genre genre)
         {
-            _context.Genre.Add(genre);
+            _context.Genres.Add(genre);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetGenre", new { id = genre.Id }, genre);
@@ -88,13 +86,13 @@ namespace Net_CampMyProject.Controllers.API
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGenre(int id)
         {
-            var genre = await _context.Genre.FindAsync(id);
+            var genre = await _context.Genres.FindAsync(id);
             if (genre == null)
             {
                 return NotFound();
             }
 
-            _context.Genre.Remove(genre);
+            _context.Genres.Remove(genre);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -102,7 +100,7 @@ namespace Net_CampMyProject.Controllers.API
 
         private bool GenreExists(int id)
         {
-            return _context.Genre.Any(e => e.Id == id);
+            return _context.Genres.Any(e => e.Id == id);
         }
     }
 }

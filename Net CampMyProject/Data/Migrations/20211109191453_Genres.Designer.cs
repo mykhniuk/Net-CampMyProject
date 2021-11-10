@@ -10,15 +10,15 @@ using Net_CampMyProject.Data;
 namespace Net_CampMyProject.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20211024143112_GenreAndCountryToFilm")]
-    partial class GenreAndCountryToFilm
+    [Migration("20211109191453_Genres")]
+    partial class Genres
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.11")
+                .HasAnnotation("ProductVersion", "5.0.12")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -270,9 +270,6 @@ namespace Net_CampMyProject.Data.Migrations
                     b.Property<string>("Duration")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Genre")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ImgUrl")
                         .HasColumnType("nvarchar(max)");
 
@@ -285,9 +282,6 @@ namespace Net_CampMyProject.Data.Migrations
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Screenplay")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
@@ -297,6 +291,28 @@ namespace Net_CampMyProject.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Films");
+                });
+
+            modelBuilder.Entity("Net_CampMyProject.Data.Models.FilmGenre", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("FilmId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GenreId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FilmId");
+
+                    b.HasIndex("GenreId");
+
+                    b.ToTable("FilmGenres");
                 });
 
             modelBuilder.Entity("Net_CampMyProject.Data.Models.FilmPerson", b =>
@@ -362,6 +378,21 @@ namespace Net_CampMyProject.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("FilmRatingSources");
+                });
+
+            modelBuilder.Entity("Net_CampMyProject.Data.Models.Genre", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("GenreType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Genres");
                 });
 
             modelBuilder.Entity("Net_CampMyProject.Data.Models.Person", b =>
@@ -459,6 +490,25 @@ namespace Net_CampMyProject.Data.Migrations
                     b.Navigation("Film");
                 });
 
+            modelBuilder.Entity("Net_CampMyProject.Data.Models.FilmGenre", b =>
+                {
+                    b.HasOne("Net_CampMyProject.Data.Models.Film", "Film")
+                        .WithMany("Genres")
+                        .HasForeignKey("FilmId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Net_CampMyProject.Data.Models.Genre", "Genre")
+                        .WithMany("FilmGenres")
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Film");
+
+                    b.Navigation("Genre");
+                });
+
             modelBuilder.Entity("Net_CampMyProject.Data.Models.FilmPerson", b =>
                 {
                     b.HasOne("Net_CampMyProject.Data.Models.Film", "Film")
@@ -501,9 +551,16 @@ namespace Net_CampMyProject.Data.Migrations
                 {
                     b.Navigation("Comments");
 
+                    b.Navigation("Genres");
+
                     b.Navigation("Persons");
 
                     b.Navigation("Ratings");
+                });
+
+            modelBuilder.Entity("Net_CampMyProject.Data.Models.Genre", b =>
+                {
+                    b.Navigation("FilmGenres");
                 });
 
             modelBuilder.Entity("Net_CampMyProject.Data.Models.Person", b =>

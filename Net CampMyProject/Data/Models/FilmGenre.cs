@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Net_CampMyProject.Data.Models
 {
@@ -11,8 +7,8 @@ namespace Net_CampMyProject.Data.Models
         [Key]
         public int Id { get; set; }       
 
-        [Display(Name = "Genre")]
-        public int GenrenId { get; set; }
+        [Display(Name = "Genres")]
+        public int GenreId { get; set; }
         public virtual Genre Genre { get; set; }
 
         [Display(Name = "Film")]

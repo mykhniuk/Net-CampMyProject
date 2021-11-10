@@ -1,19 +1,18 @@
-﻿using Newtonsoft.Json;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace FilmsParser.Extensions
 {
     public static class HttpClientExtensions
     {
-        public static Task<HttpResponseMessage> PostAsJsonAsync<T>(this HttpClient httpClient, string url, T data)
+        public static async Task<T> PostAsJsonAsyncEx<T>(this HttpClient httpClient, string url, T data)
         {
-            var dataAsString = JsonConvert.SerializeObject(data);
-            var content = new StringContent(dataAsString);
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            var response = await httpClient.PostAsJsonAsync(url, data);
 
-            return httpClient.PostAsync(url, content);
+            return await response.Content.ReadFromJsonAsync<T>();
         }
 
         public static Task<HttpResponseMessage> PutAsJsonAsync<T>(this HttpClient httpClient, string url, T data)
@@ -25,7 +24,7 @@ namespace FilmsParser.Extensions
             return httpClient.PutAsync(url, content);
         }
 
-        public static async Task<T> GetAsAsync<T>(this HttpClient httpClient, string url)
+        public static async Task<T> GetAsync<T>(this HttpClient httpClient, string url)
         {
             var response = await httpClient.GetAsync(url);
             var responseContent = await response.Content.ReadAsStringAsync();

@@ -2,12 +2,17 @@
 
 namespace Net_CampMyProject.Data.Migrations
 {
-    public partial class AddGenres : Migration
+    public partial class Genres : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.RenameColumn(
+                name: "Screenplay",
+                table: "Films",
+                newName: "Country");
+
             migrationBuilder.CreateTable(
-                name: "Genre",
+                name: "Genres",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -16,54 +21,58 @@ namespace Net_CampMyProject.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Genre", x => x.Id);
+                    table.PrimaryKey("PK_Genres", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "FilmGenre",
+                name: "FilmGenres",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GenrenId = table.Column<int>(type: "int", nullable: false),
-                    GenreId = table.Column<int>(type: "int", nullable: true),
+                    GenreId = table.Column<int>(type: "int", nullable: false),
                     FilmId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FilmGenre", x => x.Id);
+                    table.PrimaryKey("PK_FilmGenres", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FilmGenre_Films_FilmId",
+                        name: "FK_FilmGenres_Films_FilmId",
                         column: x => x.FilmId,
                         principalTable: "Films",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FilmGenre_Genre_GenreId",
+                        name: "FK_FilmGenres_Genres_GenreId",
                         column: x => x.GenreId,
-                        principalTable: "Genre",
+                        principalTable: "Genres",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_FilmGenre_FilmId",
-                table: "FilmGenre",
+                name: "IX_FilmGenres_FilmId",
+                table: "FilmGenres",
                 column: "FilmId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FilmGenre_GenreId",
-                table: "FilmGenre",
+                name: "IX_FilmGenres_GenreId",
+                table: "FilmGenres",
                 column: "GenreId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "FilmGenre");
+                name: "FilmGenres");
 
             migrationBuilder.DropTable(
-                name: "Genre");
+                name: "Genres");
+
+            migrationBuilder.RenameColumn(
+                name: "Country",
+                table: "Films",
+                newName: "Screenplay");
         }
     }
 }

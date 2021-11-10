@@ -22,7 +22,7 @@ namespace Net_CampMyProject.Controllers
         }
 
         // GET: Films
-        public async Task<IActionResult> Index(string sortBy = nameof(Film.Title), SortOrder sortOrder = SortOrder.Ascending, int takeCount = 10)
+        public async Task<IActionResult> Index(string sortBy = nameof(Film.Title), SortOrder sortOrder = SortOrder.Ascending, int takeCount = 20)
         {
             var filmsQuery = _db.Films.AsNoTracking().Select(f => new FimViewModel
             {
@@ -51,9 +51,10 @@ namespace Net_CampMyProject.Controllers
         // GET: Films/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            var film = await _db.Films.Include(f => f.Comments)
-                                      .ThenInclude(c => c.Author).Include(c=>c.Persons).ThenInclude(c=>c.Person)
-                                      .FirstOrDefaultAsync(m => m.Id == id);
+            var film = await _db.Films.Include(f=>f.Comments).ThenInclude(c=>c.Author)            
+                                      .Include(c => c.Persons).ThenInclude(c => c.Person)
+                                      .Include(c => c.Genres).ThenInclude(k=>k.Genre)
+                                      .FirstOrDefaultAsync(m => m.Id == id);           
 
             if (film == null)
                 return NotFound();
