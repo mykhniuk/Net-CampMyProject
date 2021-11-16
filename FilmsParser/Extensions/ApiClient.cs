@@ -85,5 +85,27 @@ namespace FilmsParser.Extensions
             public static string FilmGenres = "FilmGenres";
             public static string Genres = "Genres";
         }
+        public async Task<FilmRatingSource> AddOrGetRatingSource(string resourceWebsite)
+        {
+            var allRatingSources = await _httpClient.GetAsync<List<FilmRatingSource>>(Endpoints.FilmRatingSources);
+
+            var existingGenre = allRatingSources.FirstOrDefault(g => g.ResourceWebsite == resourceWebsite);
+            if (existingGenre != null)
+                return existingGenre;
+
+            return await _httpClient.PostAsJsonAsyncEx(Endpoints.FilmRatingSources, new FilmRatingSource() { ResourceWebsite = resourceWebsite });
+        }
+        public async Task<FilmRating> AddFilmRating(int newFilmId, int newRatingSourceId, string rating)
+        {
+            return await _httpClient.PostAsJsonAsyncEx(Endpoints.FilmRatings, new FilmRating()
+            {
+                FilmId = newFilmId,
+                SourceId= newRatingSourceId,
+                Rating = rating
+
+            });
+        }
+
+
     }
 }

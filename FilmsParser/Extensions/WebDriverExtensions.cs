@@ -34,7 +34,7 @@ namespace FilmsParser.Extensions
             return driver
                 .FindElements(By.XPath("//div[@data-attrid = 'kc:/award/award_winner:awards']"))
                 .FirstOrDefault()?
-                .Text.Replace("Нагороди:", "");
+                .Text.Replace("Нагороди:", "").Replace(", БІЛЬШЕ","");
         }
 
         public static string GetDurationOrDefault(this IWebDriver driver)
@@ -49,7 +49,7 @@ namespace FilmsParser.Extensions
         {
             return driver
                 .FindElements(By.XPath("//div[@data-attrid = 'kc:/award/award_winner:nominations']")).FirstOrDefault()
-                ?.Text.Replace("Номінації:", "");
+                ?.Text.Replace("Номінації:", "").Replace(", БІЛЬШЕ","");
         }
 
         public static string GetBoxOffice(this IWebDriver driver)
@@ -65,15 +65,20 @@ namespace FilmsParser.Extensions
             return driver.FindElements(By.XPath("//div[@data-attrid='description']"))
                 .FirstOrDefault()?.Text
                 .Replace("Опис", "")
-                .Replace("Вікіпедія", "")
+                .Replace("Вікіпедія", "").Replace("Переклад з англійської-", "").Replace("(англійська мова) Переглянути оригінальний опис", "").Replace(", БІЛЬШЕ", "")
                 .Trim();
+        }
+        public static string GetWikiUrl(this IWebDriver driver)
+        {
+            return driver.FindElements(By.XPath("//div[@data-attrid='description']//div//div//span//a"))
+                .FirstOrDefault().GetAttribute("href");
         }
 
         public static DateTime GetReleaseDateOrDefault(this IWebDriver driver, CultureInfo culture)
         {
             var dateTimeValidation = driver
                 .FindElements(By.XPath(
-                    "//div[@data-attrid = 'kc:/film/film:theatrical region aware release date']//span[@class='Eq0J8 LrzXr kno-fv']"))
+                    "//div[@data-attrid='kc:/film/film:theatrical region aware release date']//span[@class='LrzXr kno-fv wHYlTd z8gr9e']"))
                 .FirstOrDefault();
 
             string dtStr;
@@ -81,7 +86,7 @@ namespace FilmsParser.Extensions
             if (dateTimeValidation == null)
                 dtStr = driver
                     .FindElements(By.XPath(
-                        "//div[@data-attrid='kc:/film/film:release date']//span[@class='Eq0J8 LrzXr kno-fv']"))
+                        "//div[@data-attrid='kc:/film/film:release date']//span[@class='LrzXr kno-fv wHYlTd z8gr9e']"))
                     .FirstOrDefault()?.Text.Split(".").FirstOrDefault();
             else
                 dtStr = dateTimeValidation.Text.Split(".").FirstOrDefault();
@@ -118,7 +123,7 @@ namespace FilmsParser.Extensions
             var newPerson = new Person
             {
                 Description = driver.FindElements(By.XPath("//div[@data-attrid='description']")).FirstOrDefault()?.Text
-                    .Replace("Опис", ""),
+                    .Replace("Опис", "").Replace("Вікіпедія", "").Replace("(англійська мова) Переглянути оригінальний опис",""),
 
                 BirthnIformation = driver.FindElements(By.XPath("//div[@data-attrid='kc:/people/person:born']"))
                     .FirstOrDefault()?.Text.Replace("Народження:", ""),
@@ -259,5 +264,45 @@ namespace FilmsParser.Extensions
 
             return result;
         }
+        public static string GetCurrentUrl(this IWebDriver driver)
+        {
+            return driver.Url;
+        }
+        public static List<FilmRatingRatingSourceRelated> ParsFilmRating(this ChromeDriver driver)
+        {
+            var result = new List<FilmRatingRatingSourceRelated>();
+            var currentUrl = driver.GetCurrentUrl();
+            var urlForGetRating = currentUrl.Replace("=uk", "=en");
+            driver.OpenUrlInNewTab(urlForGetRating);
+            driver.Navigate().GoToUrl(urlForGetRating);
+            var ratingsLinks = driver.FindElements(By.XPath("//div[@data-attrid = 'kc:/film/film:reviews']//a"));
+            
+            if (ratingsLinks!=null)
+            {
+                foreach (var element in ratingsLinks)
+                {
+                    var newRatingSource = new FilmRatingRatingSourceRelated();
+                    var newRatingSource1 = new FilmRatingSource();
+                    newRatingSource1.ResourceWebsite = element.GetAttribute("href");
+                    newRatingSource.RatingValue = element.Text;
+                    newRatingSource.filmRatingSource = newRatingSource1;
+                    result.Add(newRatingSource);
+                }
+                driver.Close();
+                driver.SwitchTo().Window(driver.WindowHandles.FirstOrDefault());
+            }
+            var googleRatingsLink = driver.FindElements(By.XPath("//div[@data-attrid='kc:/ugc:thumbs_up']//div[@class='srBp4 Vrkhme']")).FirstOrDefault();
+            if (googleRatingsLink !=null)
+            {
+                var newRatingSource = new FilmRatingRatingSourceRelated();
+                var newRatingSource1 = new FilmRatingSource();
+                newRatingSource1.ResourceWebsite = "https://www.google.com/";
+                newRatingSource.RatingValue = googleRatingsLink.Text;
+                newRatingSource.filmRatingSource = newRatingSource1;
+                result.Add(newRatingSource);
+            }
+            return result;
+        }
+
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FilmsParser.Extensions;
+using Microsoft.EntityFrameworkCore.Internal;
 using Net_CampMyProject.Data.Models;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -15,12 +17,12 @@ namespace FilmsParser
         private static readonly string SearchStringPrefix = "Фільми";
         private static readonly string AcceptKeyWord = "Прийняти";
         private static readonly string SearchKeyword = "Пошук";
-        private static readonly int StartFromYear = 2015;
+        private static readonly int StartFromYear = 2020;
 
         private static readonly CultureInfo CultureInfo = new("uk-UA");
         private static readonly string imagesFolderPath = @"E:\New folder (3)\Net CampMyProject\wwwroot\img\";
 
-        private static string apiBaseUrl = "https://localhost:5001/api/";
+        private static string apiBaseUrl = "https://watchmovie.today/api/";
 
         static async Task Main(string[] args)
         {
@@ -49,16 +51,19 @@ namespace FilmsParser
 
                 foreach (var filmInfoEl in filmInfoList)
                 {
+                  filmInfoEl.Click();
                     var filmTitle = filmInfoEl.GetAttribute("aria-label");
-
+                    
                     if (await apiClient.GetFilmByTitleOrDefaultAsync(filmTitle) != null)
                     {
+                       filmInfoEl.Click();
+                       await Task.Delay(2000);
                         continue;
                     }
 
-                    filmInfoEl.Click();
+                    
 
-                    await Task.Delay(1500);
+                    await Task.Delay(3000);
 
                     var newFilm = new Film
                     {
@@ -70,9 +75,10 @@ namespace FilmsParser
                         Awards = driver.GetAwards(),
                         BoxOffice = driver.GetBoxOffice(),
                         Nominations = driver.GetNominations(),
-                        Duration = driver.GetDurationOrDefault()
+                        Duration = driver.GetDurationOrDefault(),
+                        WikiUrl = driver.GetWikiUrl()
                     };
-
+                    await Task.Delay(3000);
                     var filmImg = filmInfoEl.FindElements(By.XPath("//g-img//img[@height ='186']")).FirstOrDefault() ??
                                   filmInfoEl.FindElements(By.XPath("//g-img[@data-attrid]//img")).FirstOrDefault();
 
@@ -86,9 +92,9 @@ namespace FilmsParser
 
                     //ADD NEW FILM
                     var addedFilm = await apiClient.AddFilmAsync(newFilm);
-                    if(addedFilm == null)
+                    if (addedFilm == null)
                         continue;
-
+                    await Task.Delay(3000);
                     //GENRES
                     var filmYearGenresEl = driver.FindElements(By.XPath("//div[@data-attrid = 'subtitle']//span")).FirstOrDefault();
                     if (filmYearGenresEl != null)
@@ -103,7 +109,7 @@ namespace FilmsParser
                             }
                         }
                     }
-
+                    await Task.Delay(3000);
                     //PERSONS
                     foreach (var role in Enum.GetValues<FilmPersonRole>())
                     {
@@ -113,8 +119,20 @@ namespace FilmsParser
                             await apiClient.AddFilmPerson(addedFilm.Id, person.Id, role);
                         }
                     }
-                }                         
+                    await Task.Delay(3000);
+                    //RATINGS
+                    foreach (var rating in driver.ParsFilmRating())
+                    {
+                        var ratingSource = await apiClient.AddOrGetRatingSource(rating.filmRatingSource.ResourceWebsite);
+                        await apiClient.AddFilmRating(addedFilm.Id, ratingSource.Id, rating.RatingValue);
+                        
+                    }
+                }
             }
         }
+
+        
+
+
     }
 }
