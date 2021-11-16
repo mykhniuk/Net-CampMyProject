@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Net_CampMyProject.Data.Models
 {
@@ -8,5 +9,7 @@ namespace Net_CampMyProject.Data.Models
         public int Id { get; set; }
 
         public string ResourceWebsite { get; set; }
+
+        public virtual ICollection<FilmRating> FilmRatings { get; set; }
     }
 }

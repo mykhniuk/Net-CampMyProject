@@ -19,6 +19,10 @@ namespace Net_CampMyProject.Data.Models
 
         public string TrailerUrl { get; set; }
 
+        public string Story { get; set; }
+
+        public string WikiUrl { get; set; }
+
         public string Description { get; set; }
 
         public DateTime ReleaseDate { get; set; }
@@ -40,5 +44,7 @@ namespace Net_CampMyProject.Data.Models
         public virtual ICollection<FilmRating> Ratings { get; set; }
 
         public virtual ICollection<FilmGenre> Genres { get; set; }
+
+        public virtual ICollection<MyFilmRating> MyRatings { get; set; }
     }
 }

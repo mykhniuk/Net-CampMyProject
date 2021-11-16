@@ -26,5 +26,7 @@ namespace Net_CampMyProject.Data
         public DbSet<Genre> Genres { get; set; }
 
         public DbSet<FilmGenre> FilmGenres { get; set; }
+
+        public DbSet<MyFilmRating> MyFilmRating { get; set; }
     }
 }

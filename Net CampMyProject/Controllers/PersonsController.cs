@@ -9,7 +9,7 @@ using Net_CampMyProject.Models;
 
 namespace Net_CampMyProject.Controllers
 {
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize]
     public class PersonsController : Controller
     {
         private readonly ApplicationDbContext _context;

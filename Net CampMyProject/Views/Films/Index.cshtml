@@ -1,10 +1,11 @@
 ﻿@using Net_CampMyProject.Data.Models;
-@model IEnumerable<Net_CampMyProject.Models.ViewModels.FimViewModel>
+@model Net_CampMyProject.Models.ViewModels.IndexViewModel
 
 @{
     ViewData["Title"] = "Films";
 
     var isAdmin = User.IsInRole(Roles.Admin);
+    
 }
 
 @if (isAdmin)
@@ -14,40 +15,153 @@
     </p>
 
 }
+<div class="row mb-1">
+    <div class="col-12 text-right p-3 mb-2">
+        <div class="dropdown bootstrap-select">
+            <strong>Sort by:</strong>
+            <button class="btn btn-secondary dropdown-toggle w-20 h-25" type="button"  id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                @ViewData["Message"]
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <span class="dropdown-item">@Html.ActionLink("Title", "Index", new { sortBy = nameof(Film.Title), sortOrder = ViewBag.SortOrder, page = 1 })</span>
+                <span class="dropdown-item">@Html.ActionLink("Released", "Index", new { sortBy = nameof(Film.ReleaseDate), sortOrder = ViewBag.SortOrder, page = 1 })</span>
+            </div>
+        </div>
+    </div>
+    
+</div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.ActionLink("Title", "Index", new { sortBy = nameof(Film.Title), sortOrder = ViewBag.SortOrder })
-            </th>
-            <th>
-                @Html.ActionLink("Released", "Index", new { sortBy = nameof(Film.ReleaseDate), sortOrder = ViewBag.SortOrder })
-            </th>
-            @if (isAdmin)
-            {
-                <th></th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">@item.Title</a>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ReleaseDate.Year)
-                </td>
-                <td>
-                    @if (isAdmin)
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="ml-1">E</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="ml-1">R</a>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+
+@foreach (Film film in Model.Films)
+{
+    <div class="shadow-lg p-3 mb-2 bg-white rounded">
+        <div class="row mx-md-n5">
+            <div class="col px-md-5">
+                <div class="p-3 border bg-light">
+                    <div class="row">
+                        <div class="col-8 col-sm-6">
+                            <a asp-action="Details" asp-route-id="@film.Id">
+                                <h3 class="text-dark">@film.Title</h3>
+                            </a>
+                        </div>
+                        <div class="col-8 col-sm-6">
+                            <div class="text-center">
+                                <span>Likes</span>
+                                @film.MyRatings.Where(c => c.MyRating == true).Count()
+                            </div>
+                            <div class="text-center">
+                                <span>Dislikes</span>
+                                @film.MyRatings.Where(c => c.MyRating == false).Count()
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-2">
+                        <div class="col-12 col-sm-3 text-center">
+                            <img class="rounded-lg" width="150" height="200" src="@film.ImgUrl" />
+                        </div>
+
+                        <div class="col-md-5 ">
+                            <div>
+                                <p>
+                                    <strong>
+                                        @nameof(film.ReleaseDate):
+                                    </strong>
+                                    <span>
+                                        @film.ReleaseDate.ToShortDateString()
+                                    </span>
+                                </p>
+                            </div>
+                            <div>
+                                <p>
+                                    <strong>
+                                        @nameof(film.Genres):
+                                    </strong>
+                                    @foreach (var i in film.Genres)
+                                    {
+                                        <span>
+                                            @i.Genre.GenreType
+                                        
+                                        @if (film.Genres.Select(c => c.Genre.GenreType).FirstOrDefault() == i.Genre.GenreType)
+                                        {
+                                            <span>,</span>
+                                        }
+                                        </span>
+                                    }
+                                    
+                                </p>
+                            </div>
+                            <div>
+                                <p>
+                                    <strong>
+                                        @nameof(film.Duration):
+                                    </strong>
+                                    <span>
+                                        @film.Duration
+                                    </span>
+                                </p>
+                            </div>
+                            <div>
+                                <p>
+                                    <strong>
+                                        @nameof(film.Country):
+                                    </strong>
+                                    <span>
+                                        @film.Country
+                                    </span>
+                                </p>
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
+                            <div><strong>Other ratings:</strong></div>
+
+                            @foreach (var rating in film.Ratings)
+                            {
+                                <span>
+                                    <p><a href="@rating.Source.ResourceWebsite">@rating.Rating.Replace("Користувачі Google", "").Replace("користувачів", "користувачів Google")</a></p>
+                                </span>
+                            }
+                        </div>
+                    </div>
+                    <div>
+                        <details>
+                            <summary>@nameof(film.Description)...</summary>
+                            <p>@film.Description</p>
+                        </details>
+                    </div>
+                    <div>
+                        @if (isAdmin)
+                        {
+                            <a asp-action="Edit" asp-route-id="@film.Id" class="ml-1">E</a>
+                            <a asp-action="Delete" asp-route-id="@film.Id" class="ml-1">R</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+<div class="text-center p-3 mb-2">
+    @if (Model.PageViewModel.HasPreviousPage)
+    {
+    <a asp-action="Index"
+       asp-route-page="@(Model.PageViewModel.PageNumber - 1)"
+       class="btn btn-outline-dark">
+        <i class="glyphicon glyphicon-chevron-left"></i>
+        Previous page
+    </a>
+
+    }
+    @if (Model.PageViewModel.HasNextPage)
+    {
+
+<a asp-action="Index"
+   asp-route-page="@(Model.PageViewModel.PageNumber + 1)"
+   class="btn btn-outline-dark">
+
+    <i class="glyphicon glyphicon-chevron-right"></i>
+    Next page
+</a>
+    }
+    </div>

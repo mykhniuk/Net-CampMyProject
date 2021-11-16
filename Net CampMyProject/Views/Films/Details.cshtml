@@ -1,10 +1,14 @@
 ﻿@using Net_CampMyProject.Data.Models
+@using Net_CampMyProject.Controllers
 @model Net_CampMyProject.Data.Models.Film
 
 @{
     ViewData["Title"] = "Details";
     var isAdmin = User.IsInRole(Roles.Admin);
-    var allFilmPerson = Model.Persons;
+    var u = Model.MyRatings.Where(c => c.MyRating == true).Count();
+    var y = Model.MyRatings.Count();
+    var p = (u*1.0 / y) * 100;
+    var p1 = 100 - p;
 }
 
 <div>
@@ -20,18 +24,21 @@
                 @Html.DisplayFor(model => model.Id)
             </dd>
         }
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
+        @if (isAdmin)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Title)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Title)
+            </dd>
+        }
         @if (Model.ImgUrl != null)
         {
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.ImgUrl)
             </dt>
+
             <dd class="col-sm-10">
                 <img src="@Model.ImgUrl" />
             </dd>
@@ -40,17 +47,20 @@
             @Html.DisplayNameFor(model => model.Genres)
         </dt>
         <dd class="col-sm-10">
-            @foreach(var item in Model.Genres)
+            @foreach (var item in Model.Genres)
             {
-            <span> @item.Genre.GenreType ||</span>
-            }           
+                <span> @item.Genre.GenreType ||</span>
+            }
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Duration)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Duration)
-        </dd>
+        @if (Model.Duration != null)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Duration)
+            </dt>
+            <dd class="col-sm-10">
+                @Model.Duration
+            </dd>
+        }
         @if (Model.TrailerUrl != null)
         {
             <dt class="col-sm-2">
@@ -60,7 +70,6 @@
                 <iframe width="560" height="315" src="@Model.TrailerUrl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </dd>
         }
-
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
@@ -71,38 +80,58 @@
             @Html.DisplayNameFor(model => model.ReleaseDate)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ReleaseDate)
+            @Model.ReleaseDate.ToShortDateString()
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Budget)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Budget)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Languages)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Languages)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Awards)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Awards)
-        </dd>        
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.BoxOffice)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.BoxOffice)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Nominations)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Nominations)
-        </dd>
+        @if (Model.Languages != null)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Budget)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Budget)
+            </dd>
+        }
+
+        @if (Model.Languages != null)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Languages)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Languages)
+            </dd>
+        }
+
+        @if (Model.Awards != null)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Awards)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Awards)
+            </dd>
+        }
+
+        @if (Model.BoxOffice != null)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.BoxOffice)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.BoxOffice)
+            </dd>
+        }
+
+        @if (Model.Nominations != null)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Nominations)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Nominations)
+            </dd>
+        }
+
         @if (Model.Persons.Where(c => c.Role == FilmPersonRole.Director).FirstOrDefault() != null)
         {
             <dt class="col-sm-2">
@@ -194,6 +223,27 @@
                 }
             </dd>
         }
+        @if (Model.Ratings.FirstOrDefault() != null)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Ratings)
+            </dt>
+            <dd class="col-sm-10">
+                @foreach (var source in Model.Ratings)
+                {
+                    <div>
+                        <a href="@source.Source.ResourceWebsite">@source.Rating.Trim().Split(" ").FirstOrDefault().Trim()</a>
+
+                    </div>
+                }
+            </dd>
+        }
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Story)
+    </dt>
+    <dd class="col-sm-10">
+        @Model.Story
+    </dd>
 
     </dl>
 </div>
@@ -201,67 +251,98 @@
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     <a asp-action="Index">Back to List</a>
 </div>
-<h4>Add Comment Form</h4>
 
+
+<h4>My Rating:</h4>
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create" asp-controller="Comments">
+        <form asp-action="CreateOrUpdate" asp-controller="MyFilmRatings">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input hidden="hidden" name="@nameof(Comment.FilmId)" value="@Model.Id" class="form-control" />
 
-            <div class="form-group">
-                <label for="@nameof(Comment.Content)" class="control-label"></label>
-                <input name="@nameof(Comment.Content)" class="form-control" />
-            </div>
-
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-danger" />
+            <input hidden="hidden" name="@nameof(MyFilmRating.FilmId)" value="@Model.Id" class="form-control" />
+            <input hidden="hidden" name="@nameof(MyFilmRating.Author)" value="@User.Identity" class="form-control" />
+            <div class="form-group form-check">
+                <div class="form-group">
+                    <button class="btn btn-success btn-lg" name="@nameof(MyFilmRating.MyRating)" value="true" title="Likes">@Model.MyRatings.Where(c => c.MyRating == true).Count()</button> :
+                    <button class="btn btn-danger btn-lg" name="@nameof(MyFilmRating.MyRating)" value="false" title="Dislikes">@Model.MyRatings.Where(c => c.MyRating == false).Count()</button>
+                </div>
             </div>
         </form>
     </div>
 </div>
+@if (double.IsNaN(p) == false)
+{
+    <div class="progress bg-danger">
+        <div class="progress-bar bg-success" role="progressbar" style="width:@p%" aria-valuenow="@p" aria-valuemin="0" aria-valuemax="100">@Math.Round(p, 1)%</div>
+        <div class="progress-bar bg-danger" role="progressbar" style="width:@p1%">@Math.Round(p1, 1)%</div>
+    </div>
+}
+
+
+
+<h4>Add Comment Form</h4>
+
+<div class="form-group">
+    <form asp-action="Create" asp-controller="Comments">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input hidden="hidden" name="@nameof(Comment.FilmId)" value="@Model.Id" class="form-control" />
+
+        <div class="form-group">
+            <label for="@nameof(Comment.Content)">Comment text:</label>
+            <textarea class="form-control" name="@nameof(Comment.Content)" rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Add comment" class="btn btn-danger" />
+        </div>
+    </form>
+</div>
+
+
 
 <h2>Comments</h2>
 
 <table class="table">
     <thead>
+    <tr>
+        @if (isAdmin)
+        {
+            <th></th>
+        }
+        <th>
+            DateTime
+        </th>
+        <th>
+            Author
+        </th>
+        <th>
+            Content
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Comments.OrderByDescending(c => c.DateTime).Take(10))
+    {
         <tr>
             @if (isAdmin)
             {
-                <th></th>
+                <td>
+                    <a asp-action="Edit" asp-controller="Comments" asp-route-id="@item.Id">E</a> |
+                    <a asp-action="Details" asp-controller="Comments" asp-route-id="@item.Id">D</a> |
+                    <a asp-action="Delete" asp-controller="Comments" asp-route-id="@item.Id">R</a>
+                </td>
             }
-            <th>
-                DateTime
-            </th>
-            <th>
-                Author
-            </th>
-            <th>
-                Content
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Comments.OrderByDescending(c => c.DateTime).Take(10))
-        {
-            <tr>
-                @if (isAdmin)
-                {
-                    <td>
-                        <a asp-action="Edit" asp-controller="Comments" asp-route-id="@item.Id">E</a> |
-                        <a asp-action="Details" asp-controller="Comments" asp-route-id="@item.Id">D</a> |
-                        <a asp-action="Delete" asp-controller="Comments" asp-route-id="@item.Id">R</a>
-                    </td>
-                }
-                <td>
-                    @Html.DisplayFor(modelItem => item.DateTime)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Author.UserName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Content)
-                </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Author.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Content)
+            </td>
 
-            </tr>
-        }
+        </tr>
+    }
+    </tbody>
+</table>

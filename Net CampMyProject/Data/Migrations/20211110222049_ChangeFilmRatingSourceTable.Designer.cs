@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Net_CampMyProject.Data;
 
 namespace Net_CampMyProject.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211110222049_ChangeFilmRatingSourceTable")]
+    partial class ChangeFilmRatingSourceTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -280,16 +282,10 @@ namespace Net_CampMyProject.Data.Migrations
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Story")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TrailerUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WikiUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -397,31 +393,6 @@ namespace Net_CampMyProject.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Genres");
-                });
-
-            modelBuilder.Entity("Net_CampMyProject.Data.Models.MyFilmRating", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("AuthorId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("FilmId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("MyRating")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
-
-                    b.HasIndex("FilmId");
-
-                    b.ToTable("MyFilmRating");
                 });
 
             modelBuilder.Entity("Net_CampMyProject.Data.Models.Person", b =>
@@ -576,30 +547,11 @@ namespace Net_CampMyProject.Data.Migrations
                     b.Navigation("Source");
                 });
 
-            modelBuilder.Entity("Net_CampMyProject.Data.Models.MyFilmRating", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId");
-
-                    b.HasOne("Net_CampMyProject.Data.Models.Film", "Film")
-                        .WithMany("MyRatings")
-                        .HasForeignKey("FilmId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Author");
-
-                    b.Navigation("Film");
-                });
-
             modelBuilder.Entity("Net_CampMyProject.Data.Models.Film", b =>
                 {
                     b.Navigation("Comments");
 
                     b.Navigation("Genres");
-
-                    b.Navigation("MyRatings");
 
                     b.Navigation("Persons");
 

@@ -10,17 +10,28 @@
     <h4>@Model.Name</h4>
     <hr />
     <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
+        @if (isAdmin)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Id)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Id)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+        }
         @if (Model.ImgUrl != null)
         {
+
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.ImgUrl)
             </dt>
+
             <dd class="col-sm-10">
                 <img src="@Model.ImgUrl" />
             </dd>
@@ -42,7 +53,7 @@
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.SocialNetworksLinks)
             </dt>
-            @if (Model.SocialNetworksLinks != null)
+            @if (Model.SocialNetworksLinks.FirstOrDefault() != null)
             {
 
                 @foreach (var item in Model.SocialNetworksLinks.Split(","))

@@ -13,37 +13,43 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light  bg-dark text-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Films" asp-action="Index">Films</a>
+                <a class="navbar-brand text-white" asp-area="" asp-controller="Films" asp-action="Index">WMT</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav flex-grow-1 ">
                         @if (isAdmin)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Comments" asp-action="Index">Comments</a>
+                                <a class="nav-link text-white-50" asp-area="" asp-controller="Comments" asp-action="Index">Comments</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Persons" asp-action="Index">Persons</a>
+                                <a class="nav-link text-white-50" asp-area="" asp-controller="Persons" asp-action="Index">Persons</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="FilmPersons" asp-action="Index">F.Persons</a>
+                                <a class="nav-link text-white-50" asp-area="" asp-controller="FilmPersons" asp-action="Index">F.Persons</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="FilmRatings" asp-action="Index">F.Ratings</a>
+                                <a class="nav-link text-white-50" asp-area="" asp-controller="FilmRatings" asp-action="Index">F.Ratings</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="FilmRatingSources" asp-action="Index">F.Rating Sources</a>
+                                <a class="nav-link text-white-50" asp-area="" asp-controller="FilmRatingSources" asp-action="Index">F.Rating Sources</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="FilmGenres" asp-action="Index">F.Genress</a>
+                                <a class="nav-link text-white-50" asp-area="" asp-controller="FilmGenres" asp-action="Index">F.Genress</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Genres" asp-action="Index">Genress</a>
+                                <a class="nav-link text-white-50" asp-area="" asp-controller="Genres" asp-action="Index">Genress</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white-50" asp-area="" asp-controller="MyFilmRatings" asp-action="Index">MyRatings</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white-50" asp-area="" asp-controller="Films" asp-action="Index1">Index1</a>
                             </li>
                         }
                     </ul>
@@ -60,7 +66,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2021 - Net_CampMyProject - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2021 - WATCHMOVIE.TODAY - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

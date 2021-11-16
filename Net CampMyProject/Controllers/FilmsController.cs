@@ -22,14 +22,14 @@ namespace Net_CampMyProject.Controllers
         }
 
         // GET: Films
-        public async Task<IActionResult> Index(string sortBy = nameof(Film.Title), SortOrder sortOrder = SortOrder.Ascending, int takeCount = 20)
+        public async Task<IActionResult> Index(string sortBy = nameof(Film.Title), SortOrder sortOrder = SortOrder.Ascending, int takeCount = 20, int page=1)
         {
-            var filmsQuery = _db.Films.AsNoTracking().Select(f => new FimViewModel
-            {
-                Id = f.Id,
-                Title = f.Title,
-                ReleaseDate = f.ReleaseDate,
-            });
+           int pageSize = 5;
+           
+           var filmsQuery = _db.Films.AsNoTracking()
+               .Include(g => g.Genres).ThenInclude(g => g.Genre).AsNoTracking()
+               .Include(r => r.Ratings).ThenInclude(s => s.Source).AsNoTracking()
+               .Include(m => m.MyRatings).AsNoTracking().AsSplitQuery();
 
             if (sortOrder == SortOrder.Unspecified)
                 sortOrder = SortOrder.Descending;
@@ -44,8 +44,18 @@ namespace Net_CampMyProject.Controllers
             };
 
             ViewBag.SortOrder = isDesc ? SortOrder.Ascending : SortOrder.Descending;
+            ViewData["Message"] = sortBy;
 
-            return View(await filmsQuery.Take(takeCount).ToListAsync());
+            var count = await filmsQuery.CountAsync();
+            var items = await filmsQuery.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            PageViewModel pageViewModel = new PageViewModel(count, page, pageSize);
+            IndexViewModel viewModel = new IndexViewModel
+            {
+                PageViewModel = pageViewModel,
+                Films = items
+            };
+            return View(viewModel);
         }
 
         // GET: Films/Details/5
@@ -54,6 +64,9 @@ namespace Net_CampMyProject.Controllers
             var film = await _db.Films.Include(f=>f.Comments).ThenInclude(c=>c.Author)            
                                       .Include(c => c.Persons).ThenInclude(c => c.Person)
                                       .Include(c => c.Genres).ThenInclude(k=>k.Genre)
+                                      .Include(c=>c.Ratings).ThenInclude(c=>c.Source)
+                                      .Include(r=>r.MyRatings)
+                                      .AsSplitQuery()
                                       .FirstOrDefaultAsync(m => m.Id == id);           
 
             if (film == null)
@@ -96,7 +109,7 @@ namespace Net_CampMyProject.Controllers
                 return NotFound();
             }
 
-            var Film = await _db.Films.FindAsync(id);
+            var Film = await _db.Films.AsSplitQuery().Include(c=>c.Ratings).ThenInclude(c=>c.Source).FirstOrDefaultAsync(m => m.Id == id);
             if (Film == null)
             {
                 return NotFound();
@@ -170,5 +183,27 @@ namespace Net_CampMyProject.Controllers
         {
             return _db.Films.Any(e => e.Id == id);
         }
+        public async Task<IActionResult> Index1(int page = 1)
+        {
+            int pageSize = 3;   // количество элементов на странице
+
+            IQueryable<Film> source = _db.Films.Include(f => f.Comments).ThenInclude(c => c.Author)
+                .Include(c => c.Persons).ThenInclude(c => c.Person)
+                .Include(c => c.Genres).ThenInclude(k => k.Genre)
+                .Include(c => c.Ratings).ThenInclude(c => c.Source)
+                .Include(r => r.MyRatings)
+                .AsSplitQuery();
+            var count = await source.CountAsync();
+            var items = await source.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            PageViewModel pageViewModel = new PageViewModel(count, page, pageSize);
+            IndexViewModel viewModel = new IndexViewModel
+            {
+                PageViewModel = pageViewModel,
+                Films = items
+            };
+            return View(viewModel);
+        }
     }
 }
+
