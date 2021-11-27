@@ -12,8 +12,11 @@
 }
 
 <div>
-    <h4>@Model.Title</h4>
-    <hr />
+    <div class="w-75 m-1">
+        <h4>@Model.Title</h4>
+        <hr>
+    </div>
+
     <dl class="row">
         @if (isAdmin)
         {
@@ -238,111 +241,112 @@
                 }
             </dd>
         }
-    <dt class="col-sm-2">
-        @Html.DisplayNameFor(model => model.Story)
-    </dt>
-    <dd class="col-sm-10">
-        @Model.Story
-    </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Story)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Story
+        </dd>
 
     </dl>
-</div>
-<div>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+    <div>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        <a asp-action="Index">Back to List</a>
+    </div>
 
 
-<h4>My Rating:</h4>
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="CreateOrUpdate" asp-controller="MyFilmRatings">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <h4>My Rating:</h4>
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="CreateOrUpdate" asp-controller="MyFilmRatings">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <input hidden="hidden" name="@nameof(MyFilmRating.FilmId)" value="@Model.Id" class="form-control" />
-            <input hidden="hidden" name="@nameof(MyFilmRating.Author)" value="@User.Identity" class="form-control" />
-            <div class="form-group form-check">
-                <div class="form-group">
-                    <button class="btn btn-success btn-lg" name="@nameof(MyFilmRating.MyRating)" value="true" title="Likes">@Model.MyRatings.Where(c => c.MyRating == true).Count()</button> :
-                    <button class="btn btn-danger btn-lg" name="@nameof(MyFilmRating.MyRating)" value="false" title="Dislikes">@Model.MyRatings.Where(c => c.MyRating == false).Count()</button>
+                <input hidden="hidden" name="@nameof(MyFilmRating.FilmId)" value="@Model.Id" class="form-control" />
+                <input hidden="hidden" name="@nameof(MyFilmRating.Author)" value="@User.Identity" class="form-control" />
+                <div class="form-group form-check">
+                    <div class="form-group">
+                        <button class="btn btn-success btn-lg" name="@nameof(MyFilmRating.MyRating)" value="true" title="Likes">@Model.MyRatings.Where(c => c.MyRating == true).Count()</button> :
+                        <button class="btn btn-danger btn-lg" name="@nameof(MyFilmRating.MyRating)" value="false" title="Dislikes">@Model.MyRatings.Where(c => c.MyRating == false).Count()</button>
+                    </div>
                 </div>
+            </form>
+        </div>
+    </div>
+    @if (double.IsNaN(p) == false)
+    {
+        <div class="progress bg-danger">
+            <div class="progress-bar bg-success" role="progressbar" style="width:@p%" aria-valuenow="@p" aria-valuemin="0" aria-valuemax="100">@Math.Round(p, 1)%</div>
+            <div class="progress-bar bg-danger" role="progressbar" style="width:@p1%">@Math.Round(p1, 1)%</div>
+        </div>
+    }
+
+
+
+    <h4>Add Comment Form</h4>
+
+    <div class="form-group">
+        <form asp-action="Create" asp-controller="Comments">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input hidden="hidden" name="@nameof(Comment.FilmId)" value="@Model.Id" class="form-control" />
+
+            <div class="form-group">
+                <label for="@nameof(Comment.Content)">Comment text:</label>
+                <textarea class="form-control" name="@nameof(Comment.Content)" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Add comment" class="btn btn-danger" />
             </div>
         </form>
     </div>
-</div>
-@if (double.IsNaN(p) == false)
-{
-    <div class="progress bg-danger">
-        <div class="progress-bar bg-success" role="progressbar" style="width:@p%" aria-valuenow="@p" aria-valuemin="0" aria-valuemax="100">@Math.Round(p, 1)%</div>
-        <div class="progress-bar bg-danger" role="progressbar" style="width:@p1%">@Math.Round(p1, 1)%</div>
-    </div>
-}
 
 
 
-<h4>Add Comment Form</h4>
+    <h2>Comments</h2>
 
-<div class="form-group">
-    <form asp-action="Create" asp-controller="Comments">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <input hidden="hidden" name="@nameof(Comment.FilmId)" value="@Model.Id" class="form-control" />
-
-        <div class="form-group">
-            <label for="@nameof(Comment.Content)">Comment text:</label>
-            <textarea class="form-control" name="@nameof(Comment.Content)" rows="3"></textarea>
-        </div>
-
-        <div class="form-group">
-            <input type="submit" value="Add comment" class="btn btn-danger" />
-        </div>
-    </form>
-</div>
-
-
-
-<h2>Comments</h2>
-
-<table class="table">
-    <thead>
-    <tr>
-        @if (isAdmin)
-        {
-            <th></th>
-        }
-        <th>
-            DateTime
-        </th>
-        <th>
-            Author
-        </th>
-        <th>
-            Content
-        </th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model.Comments.OrderByDescending(c => c.DateTime).Take(10))
-    {
-        <tr>
-            @if (isAdmin)
+    <table class="table">
+        <thead>
+            <tr>
+                @if (isAdmin)
+                {
+                    <th></th>
+                }
+                <th>
+                    DateTime
+                </th>
+                <th>
+                    Author
+                </th>
+                <th>
+                    Content
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Comments.OrderByDescending(c => c.DateTime).Take(10))
             {
-                <td>
-                    <a asp-action="Edit" asp-controller="Comments" asp-route-id="@item.Id">E</a> |
-                    <a asp-action="Details" asp-controller="Comments" asp-route-id="@item.Id">D</a> |
-                    <a asp-action="Delete" asp-controller="Comments" asp-route-id="@item.Id">R</a>
-                </td>
-            }
-            <td>
-                @Html.DisplayFor(modelItem => item.DateTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Author.UserName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
+                <tr>
+                    @if (isAdmin)
+                    {
+                        <td>
+                            <a asp-action="Edit" asp-controller="Comments" asp-route-id="@item.Id">E</a> |
+                            <a asp-action="Details" asp-controller="Comments" asp-route-id="@item.Id">D</a> |
+                            <a asp-action="Delete" asp-controller="Comments" asp-route-id="@item.Id">R</a>
+                        </td>
+                    }
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DateTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Author.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Content)
+                    </td>
 
-        </tr>
-    }
-    </tbody>
-</table>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

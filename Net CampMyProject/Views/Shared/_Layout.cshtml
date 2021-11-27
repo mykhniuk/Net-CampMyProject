@@ -1,5 +1,6 @@
 ﻿@{
     var isAdmin = User.IsInRole(Roles.Admin);
+    ViewData["Title"] = "Films";
 }
 
 <!DOCTYPE html>
@@ -12,59 +13,75 @@
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light  bg-dark text-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand text-white" asp-area="" asp-controller="Films" asp-action="Index">WMT</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1 ">
-                        @if (isAdmin)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white-50" asp-area="" asp-controller="Comments" asp-action="Index">Comments</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white-50" asp-area="" asp-controller="Persons" asp-action="Index">Persons</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white-50" asp-area="" asp-controller="FilmPersons" asp-action="Index">F.Persons</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white-50" asp-area="" asp-controller="FilmRatings" asp-action="Index">F.Ratings</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white-50" asp-area="" asp-controller="FilmRatingSources" asp-action="Index">F.Rating Sources</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white-50" asp-area="" asp-controller="FilmGenres" asp-action="Index">F.Genress</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white-50" asp-area="" asp-controller="Genres" asp-action="Index">Genress</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white-50" asp-area="" asp-controller="MyFilmRatings" asp-action="Index">MyRatings</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white-50" asp-area="" asp-controller="Films" asp-action="Index1">Index1</a>
-                            </li>
-                        }
-                    </ul>
-                    <partial name="_LoginPartial" />
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light  bg-dark text-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <a class="navbar-brand text-white" asp-area="" asp-controller="Films" asp-action="Index">WMT</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 
-    <footer class="border-top footer text-muted">
+                <ul class="navbar-nav flex-grow-1">
+                    @if (User.Identity.Name != null)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white-50" asp-controller="Films" asp-action="Index" asp-route-filter="Liked">My liked films</a>
+                        </li>
+                    }
+                </ul>
+                <partial name="_LoginPartial" />
+                
+            </div>
+        </div>
+        
+    </nav>
+</header>
+
+<div class="container">
+    <div class="row justify-content-md-center">
+        <div class="col-md-auto">
+            @RenderBody()
+        </div>
+        @if (isAdmin)
+        {
+            <div class="col col-lg-2">
+                test
+
+
+
+                <div class="bg-dark text-center">
+                    <div class="text-white">
+                        <h4>Admin panel</h4>
+                    </div>
+                </div>
+                <ul>
+                    <li>
+                        <a asp-area="" asp-controller="Films" asp-action="Create">Create new film</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li>
+                        <a asp-area="" asp-controller="Comments" asp-action="Index">Comments</a>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="Persons" asp-action="Index">Persons</a>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="FilmPersons" asp-action="Index">F.Persons</a>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="FilmRatings" asp-action="Index">F.Ratings</a>
+                    </li>
+                </ul>
+
+            </div>
+        }
+    </div>
+</div>
+
+<footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2021 - WATCHMOVIE.TODAY - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>

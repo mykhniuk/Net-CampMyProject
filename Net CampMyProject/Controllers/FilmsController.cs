@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -15,21 +18,33 @@ namespace Net_CampMyProject.Controllers
     public class FilmsController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public FilmsController(ApplicationDbContext db)
+        public FilmsController(ApplicationDbContext db, UserManager<IdentityUser> userManager)
         {
             _db = db;
+            _userManager = userManager;
         }
 
         // GET: Films
-        public async Task<IActionResult> Index(string sortBy = nameof(Film.Title), SortOrder sortOrder = SortOrder.Ascending, int takeCount = 20, int page=1)
+        public async Task<IActionResult> Index(FilmsFilterType filter, string sortBy = nameof(Film.Title), SortOrder sortOrder = SortOrder.Ascending, int page = 1, int pageSize = 5)
         {
-           int pageSize = 5;
-           
-           var filmsQuery = _db.Films.AsNoTracking()
-               .Include(g => g.Genres).ThenInclude(g => g.Genre).AsNoTracking()
-               .Include(r => r.Ratings).ThenInclude(s => s.Source).AsNoTracking()
-               .Include(m => m.MyRatings).AsNoTracking().AsSplitQuery();
+            var authorId = _userManager.GetUserId(User);
+
+            var filmsQueryBase = _db.Films
+                .AsNoTracking().AsSplitQuery()
+                .Include(c => c.MyRatings)
+                .Include(c => c.Genres)
+                     .ThenInclude(c => c.Genre)
+                .Include(c => c.Ratings)
+                     .ThenInclude(c => c.Source);
+
+            var filmsQuery = filter switch
+            {
+                FilmsFilterType.All => filmsQueryBase,
+                FilmsFilterType.Liked => filmsQueryBase.Where(f => f.MyRatings.Any(r => r.AuthorId == authorId && r.MyRating == true)),
+                _ => throw new ArgumentOutOfRangeException(nameof(filter), filter, "Unknown 'filter'")
+            };
 
             if (sortOrder == SortOrder.Unspecified)
                 sortOrder = SortOrder.Descending;
@@ -43,18 +58,18 @@ namespace Net_CampMyProject.Controllers
                 _ => isDesc ? filmsQuery.OrderByDescending(s => s.Title) : filmsQuery.OrderBy(s => s.Title)
             };
 
-            ViewBag.SortOrder = isDesc ? SortOrder.Ascending : SortOrder.Descending;
-            ViewData["Message"] = sortBy;
-
             var count = await filmsQuery.CountAsync();
             var items = await filmsQuery.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-
-            PageViewModel pageViewModel = new PageViewModel(count, page, pageSize);
-            IndexViewModel viewModel = new IndexViewModel
+            
+            var viewModel = new FilmsIndexViewModel
             {
-                PageViewModel = pageViewModel,
-                Films = items
+                PaginationPageViewModel = new PaginationPageViewModel(count, page, pageSize),
+                Films = items,
+                Filter = filter,
+                SortOrder = sortOrder,
+                SortBy = sortBy,
             };
+
             return View(viewModel);
         }
 
@@ -183,27 +198,21 @@ namespace Net_CampMyProject.Controllers
         {
             return _db.Films.Any(e => e.Id == id);
         }
-        public async Task<IActionResult> Index1(int page = 1)
+        public async Task<List<Film>>GetLikedFilms()
         {
-            int pageSize = 3;   // количество элементов на странице
-
-            IQueryable<Film> source = _db.Films.Include(f => f.Comments).ThenInclude(c => c.Author)
-                .Include(c => c.Persons).ThenInclude(c => c.Person)
-                .Include(c => c.Genres).ThenInclude(k => k.Genre)
-                .Include(c => c.Ratings).ThenInclude(c => c.Source)
-                .Include(r => r.MyRatings)
-                .AsSplitQuery();
-            var count = await source.CountAsync();
-            var items = await source.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-
-            PageViewModel pageViewModel = new PageViewModel(count, page, pageSize);
-            IndexViewModel viewModel = new IndexViewModel
-            {
-                PageViewModel = pageViewModel,
-                Films = items
-            };
-            return View(viewModel);
+            var authorId = _userManager.GetUserId(User);
+            var filmsQuery = _db.Films
+                .Include(c=>c.MyRatings)
+                .Include(c=>c.Genres).ThenInclude(c=>c.Genre)
+                .Include(c=>c.Ratings).ThenInclude(c=>c.Source).AsNoTracking().Where(f => f.MyRatings.FirstOrDefault(r => r.AuthorId == authorId && r.MyRating == true) != null).ToListAsync();
+            return await filmsQuery;
         }
+    }
+
+    public enum FilmsFilterType
+    {
+        All,
+        Liked
     }
 }
 

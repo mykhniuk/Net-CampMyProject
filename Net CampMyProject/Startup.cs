@@ -1,16 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Net_CampMyProject.Data;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Net_CampMyProject.Models;
 
@@ -40,16 +36,6 @@ namespace Net_CampMyProject
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
-
-            //services.AddAuthentication()
-            //    .AddGoogle(options =>
-            //    {
-            //        IConfigurationSection googleAuthNSection =
-            //           Configuration.GetSection("Authentication:Google");
-
-            //        options.ClientId = googleAuthNSection["ClientId"];
-            //        options.ClientSecret = googleAuthNSection["ClientSecret"];
-            //    });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
