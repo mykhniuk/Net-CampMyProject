@@ -9,6 +9,8 @@ using Net_CampMyProject.Data;
 using System;
 using System.Threading.Tasks;
 using Net_CampMyProject.Models;
+using Net_CampMyProject.Services;
+using Net_CampMyProject.Services.Interfaces;
 
 namespace Net_CampMyProject
 {
@@ -36,6 +38,13 @@ namespace Net_CampMyProject
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
+
+            InitializeAppServices(services);
+        }
+
+        private void InitializeAppServices(IServiceCollection services)
+        {
+            services.AddScoped<IFilmsRepository, FilmsRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
