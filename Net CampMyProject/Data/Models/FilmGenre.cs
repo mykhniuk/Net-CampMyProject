@@ -2,11 +2,8 @@
 
 namespace Net_CampMyProject.Data.Models
 {
-    public class FilmGenre
+    public class FilmGenre : DbEntityBase<int>
     {
-        [Key]
-        public int Id { get; set; }       
-
         [Display(Name = "Genres")]
         public int GenreId { get; set; }
         public virtual Genre Genre { get; set; }

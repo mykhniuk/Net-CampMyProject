@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Net_CampMyProject.Data;
 using Net_CampMyProject.Data.Models;
 using Net_CampMyProject.Models;
+using Net_CampMyProject.Services.Interfaces;
 
 namespace Net_CampMyProject.Controllers
 {
@@ -16,32 +17,27 @@ namespace Net_CampMyProject.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly ICommentsRepository _commentsRepository;
 
-        public CommentsController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public CommentsController(ApplicationDbContext context, UserManager<IdentityUser> userManager, ICommentsRepository commentsRepository)
         {
             _context = context;
             _userManager = userManager;
+            _commentsRepository = commentsRepository;
         }
 
         // GET: Comments
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Comments.Include(c => c.Author).Include(c => c.Film);
-            return View(await applicationDbContext.ToListAsync());
+            return View(await _commentsRepository.GetAllCommentsListAsync());
         }
 
         // GET: Comments/Details/5
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-                return NotFound();
-
-            var comment = await _context.Comments
-                .Include(c => c.Author)
-                .Include(c => c.Film)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var comment = await _commentsRepository.GetByIdAsync(id);
 
             if (comment == null)
                 return NotFound();
@@ -78,8 +74,7 @@ namespace Net_CampMyProject.Controllers
                 comment.AuthorId = _userManager.GetUserId(User);
                 comment.DateTime = DateTime.Now;
 
-                _context.Add(comment);
-                await _context.SaveChangesAsync();
+                await _commentsRepository.CreateAsync(comment);
 
                 return RedirectToAction(nameof(Details), "Films", new {id = comment.FilmId});
             }
@@ -92,15 +87,9 @@ namespace Net_CampMyProject.Controllers
 
         // GET: Comments/Edit/5
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-                return NotFound();
-
-            var comment = await _context.Comments.FindAsync(id);
-            if (comment == null)
-                return NotFound();
-
+            var comment = await _commentsRepository.GetByIdAsync(id);
             InitializeSelectLists();
 
             return View(comment);
@@ -123,12 +112,11 @@ namespace Net_CampMyProject.Controllers
             {
                 try
                 {
-                    _context.Update(comment);
-                    await _context.SaveChangesAsync();
+                   await _commentsRepository.UpdateAsync(comment);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CommentExists(comment.Id))
+                    if (!await _commentsRepository.ExistsAsync(comment.Id))
                         return NotFound();
                     throw;
                 }
@@ -142,15 +130,9 @@ namespace Net_CampMyProject.Controllers
 
         // GET: Comments/Delete/5
         [Authorize(Roles = Roles.Admin)]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-                return NotFound();
-
-            var comment = await _context.Comments
-                .Include(c => c.Author)
-                .Include(c => c.Film)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var comment = await _commentsRepository.GetByIdAsync(id);
 
             if (comment == null)
                 return NotFound();
@@ -164,15 +146,8 @@ namespace Net_CampMyProject.Controllers
         [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var comment = await _context.Comments.FindAsync(id);
-            _context.Comments.Remove(comment);
-            await _context.SaveChangesAsync();
+            await _commentsRepository.DeleteByIdAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool CommentExists(int id)
-        {
-            return _context.Comments.Any(e => e.Id == id);
         }
     }
 }

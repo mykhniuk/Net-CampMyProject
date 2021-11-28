@@ -2,11 +2,8 @@
 
 namespace Net_CampMyProject.Data.Models
 {
-    public class FilmRating
+    public class FilmRating : DbEntityBase<int>
     {
-        [Key]
-        public int Id { get; set; }
-
         public string Rating { get; set; }
 
         [Display(Name = "Source")]

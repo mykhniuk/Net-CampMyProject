@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Net_CampMyProject.Data.Models
 {
-    public class Film
+    public class Film : DbEntityBase<int>
     {
-        [Key]
-        public int Id { get; set; }
-
         public string Title { get; set; }
 
         public string ImgUrl { get; set; }

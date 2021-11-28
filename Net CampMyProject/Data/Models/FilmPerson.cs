@@ -2,11 +2,8 @@
 
 namespace Net_CampMyProject.Data.Models
 {
-    public class FilmPerson
+    public class FilmPerson : DbEntityBase<int>
     {
-        [Key]
-        public int Id { get; set; }
-
         public FilmPersonRole Role { get; set; }
 
         [Display(Name = "Person")]

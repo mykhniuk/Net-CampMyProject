@@ -193,6 +193,7 @@ namespace Net_CampMyProject.Controllers
                 }
 
             InitializeSelectLists();
+
             return View(myFilmRating);
         }
         

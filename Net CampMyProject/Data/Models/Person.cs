@@ -1,13 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Net_CampMyProject.Data.Models
 {
-    public class Person
+    public class Person : DbEntityBase<int>
     {
-        [Key]
-        public int Id { get; set; }
-
         public string Name { get; set; }
 
         public string ImgUrl { get; set; }

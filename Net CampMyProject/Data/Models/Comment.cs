@@ -1,14 +1,10 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
 namespace Net_CampMyProject.Data.Models
 {
-    public class Comment
+    public class Comment : DbEntityBase<int>
     {
-        [Key]
-        public int Id { get; set; }
-
         public DateTime DateTime { get; set; }
 
         public string Content { get; set; }

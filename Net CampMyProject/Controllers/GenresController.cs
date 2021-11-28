@@ -1,40 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Net_CampMyProject.Data;
 using Net_CampMyProject.Data.Models;
+using Net_CampMyProject.Models;
+using Net_CampMyProject.Services.Interfaces;
 
 namespace Net_CampMyProject.Controllers
 {
+    [Authorize(Roles = Roles.Admin)]
     public class GenresController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IGenresRepository _repository;
 
-        public GenresController(ApplicationDbContext context)
+        public GenresController(IGenresRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         // GET: Genres
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Genres.ToListAsync());
+            return View(await _repository.GetAll().ToListAsync());
         }
 
         // GET: Genres/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var genre = await _context.Genres
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var genre = await _repository.GetByIdAsync(id);
             if (genre == null)
             {
                 return NotFound();
@@ -54,26 +47,21 @@ namespace Net_CampMyProject.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,GenreType")] Genre genre)
+        public async Task<IActionResult> Create(Genre genre)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(genre);
-                await _context.SaveChangesAsync();
+                await _repository.CreateAsync(genre);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(genre);
         }
 
         // GET: Genres/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var genre = await _context.Genres.FindAsync(id);
+            var genre = await _repository.GetByIdAsync(id);
             if (genre == null)
             {
                 return NotFound();
@@ -97,19 +85,16 @@ namespace Net_CampMyProject.Controllers
             {
                 try
                 {
-                    _context.Update(genre);
-                    await _context.SaveChangesAsync();
+                    await _repository.UpdateAsync(genre);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!GenreExists(genre.Id))
+                    if (!await _repository.ExistsAsync(genre.Id))
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -117,15 +102,9 @@ namespace Net_CampMyProject.Controllers
         }
 
         // GET: Genres/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var genre = await _context.Genres
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var genre = await _repository.GetByIdAsync(id);
             if (genre == null)
             {
                 return NotFound();
@@ -139,15 +118,8 @@ namespace Net_CampMyProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var genre = await _context.Genres.FindAsync(id);
-            _context.Genres.Remove(genre);
-            await _context.SaveChangesAsync();
+            await _repository.DeleteByIdAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool GenreExists(int id)
-        {
-            return _context.Genres.Any(e => e.Id == id);
         }
     }
 }

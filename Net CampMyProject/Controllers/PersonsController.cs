@@ -5,42 +5,34 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Net_CampMyProject.Data;
 using Net_CampMyProject.Data.Models;
-using Net_CampMyProject.Models;
+using Net_CampMyProject.Services.Interfaces;
 
 namespace Net_CampMyProject.Controllers
 {
     [Authorize]
     public class PersonsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IPersonsRepository _personRepository;
 
-        public PersonsController(ApplicationDbContext context)
+        public PersonsController(IPersonsRepository personRepository)
         {
-            _context = context;
+            _personRepository = personRepository;
         }
 
         // GET: Persons
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Persons.ToListAsync());
+            return View(await _personRepository.GetAllPersonListAsync());
         }
 
         // GET: Persons/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
+            var film = await _personRepository.GetByIdAsync(id);
+            if (film == null)
                 return NotFound();
-            }
 
-            var person = await _context.Persons.Include(c=>c.FilmPersons)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (person == null)
-            {
-                return NotFound();
-            }
-
-            return View(person);
+            return View(film);
         }
 
         // GET: Persons/Create
@@ -58,22 +50,16 @@ namespace Net_CampMyProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(person);
-                await _context.SaveChangesAsync();
+                await _personRepository.CreateAsync(person);
                 return RedirectToAction(nameof(Index));
             }
             return View(person);
         }
 
         // GET: Persons/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var person = await _context.Persons.FindAsync(id);
+            var person = await _personRepository.GetByIdAsync(id);
             if (person == null)
             {
                 return NotFound();
@@ -97,19 +83,15 @@ namespace Net_CampMyProject.Controllers
             {
                 try
                 {
-                    _context.Update(person);
-                    await _context.SaveChangesAsync();
+                    await _personRepository.UpdateAsync(person);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PersonExists(person.Id))
+                    if (!await _personRepository.ExistsAsync(person.Id))
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -117,15 +99,9 @@ namespace Net_CampMyProject.Controllers
         }
 
         // GET: Persons/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var person = await _context.Persons
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var person = await _personRepository.GetByIdAsync(id);
             if (person == null)
             {
                 return NotFound();
@@ -139,15 +115,9 @@ namespace Net_CampMyProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var person = await _context.Persons.FindAsync(id);
-            _context.Persons.Remove(person);
-            await _context.SaveChangesAsync();
+            var person = await _personRepository.GetByIdAsync(id);
+            await _personRepository.DeleteByIdAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool PersonExists(int id)
-        {
-            return _context.Persons.Any(e => e.Id == id);
         }
     }
 }

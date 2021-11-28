@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Net_CampMyProject.Controllers;
 using Net_CampMyProject.Data;
 using Net_CampMyProject.Data.Models;
 using Net_CampMyProject.Models;
@@ -12,24 +11,21 @@ using Net_CampMyProject.Services.Results;
 
 namespace Net_CampMyProject.Services
 {
-    public class FilmsRepository : IFilmsRepository, IDisposable
+    public class FilmsRepository : RepositoryBase<Film>, IFilmsRepository
     {
-        private readonly ApplicationDbContext _db;
-
-        public FilmsRepository(ApplicationDbContext db)
+        public FilmsRepository(ApplicationDbContext db) : base(db)
         {
-            _db = db;
+
         }
 
         public async Task<FilteredFilmsResult> GetFilteredAsync(FilmsFilterType filterType, string sortBy, SortOrder sortOrder, int page, int pageSize, string authorId)
         {
-            var filmsQueryBase = _db.Films
-                .AsNoTracking().AsSplitQuery()
-                .Include(c => c.MyRatings)
+            var filmsQueryBase = GetAll().AsSplitQuery()
+                    .Include(c => c.MyRatings)
                 .Include(c => c.Genres)
-                .ThenInclude(c => c.Genre)
+                    .ThenInclude(c => c.Genre)
                 .Include(c => c.Ratings)
-                .ThenInclude(c => c.Source);
+                    .ThenInclude(c => c.Source);
 
             var filmsQuery = filterType switch
             {
@@ -59,10 +55,9 @@ namespace Net_CampMyProject.Services
             };
         }
 
-        public async Task<Film> GetByIdAsync(int id)
+        public override async Task<Film> GetByIdAsync(int id)
         {
-            return await _db.Films
-                .AsNoTracking().AsSplitQuery()
+            return await GetAll().AsSplitQuery()
                 .Include(f => f.Comments)
                     .ThenInclude(c => c.Author)
                 .Include(c => c.Persons)
@@ -72,40 +67,7 @@ namespace Net_CampMyProject.Services
                 .Include(c => c.Ratings)
                     .ThenInclude(c => c.Source)
                 .Include(r => r.MyRatings)
-                .FirstOrDefaultAsync(m => m.Id == id);
-        }
-
-        public async Task CreateAsync(Film film)
-        {
-            _db.Add(film);
-            await _db.SaveChangesAsync();
-        }
-
-        public async Task UpdateAsync(Film film)
-        {
-            _db.Update(film);
-
-            await _db.SaveChangesAsync();
-        }
-
-        public async Task<bool> ExistsAsync(int id)
-        {
-            return await _db.Films.AnyAsync(e => e.Id == id);
-        }
-
-        public async Task DeleteByIdAsync(int id)
-        {
-            var film = await GetByIdAsync(id);
-            if (film != null)
-            {
-                _db.Films.Remove(film);
-                await _db.SaveChangesAsync();
-            }
-        }
-
-        public void Dispose()
-        {
-            _db?.Dispose();
+                    .FirstOrDefaultAsync(m => m.Id == id);
         }
     }
 }

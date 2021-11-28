@@ -29,6 +29,7 @@ namespace Net_CampMyProject
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddControllersWithViews()
@@ -45,6 +46,9 @@ namespace Net_CampMyProject
         private void InitializeAppServices(IServiceCollection services)
         {
             services.AddScoped<IFilmsRepository, FilmsRepository>();
+            services.AddScoped<IGenresRepository, GenresRepository>();
+            services.AddScoped<ICommentsRepository, CommentsRepository>();
+            services.AddScoped<IPersonsRepository, PersonsRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

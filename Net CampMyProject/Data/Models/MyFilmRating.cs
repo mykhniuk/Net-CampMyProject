@@ -1,13 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
 
 namespace Net_CampMyProject.Data.Models
 {
-    public class MyFilmRating
+    public class MyFilmRating : DbEntityBase<int>
     {
-        [Key]
-        public int Id { get; set; }
-
         public bool MyRating { get; set; }
 
         public int FilmId { get; set; }
