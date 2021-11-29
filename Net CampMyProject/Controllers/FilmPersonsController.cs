@@ -7,35 +7,34 @@ using Microsoft.EntityFrameworkCore;
 using Net_CampMyProject.Data;
 using Net_CampMyProject.Data.Models;
 using Net_CampMyProject.Models;
+using Net_CampMyProject.Services.Interfaces;
 
 namespace Net_CampMyProject.Controllers
 {
     [Authorize(Roles = Roles.Admin)]
     public class FilmPersonsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IFilmPersonsRepository _filmPersonRepository;
+        private readonly IFilmsRepository _filmsRepository;
+        private readonly IPersonsRepository _personsRepository;
 
-        public FilmPersonsController(ApplicationDbContext context)
+        public FilmPersonsController(IFilmPersonsRepository filmPersonRepository, IFilmsRepository filmsRepository, IPersonsRepository personsRepository)
         {
-            _context = context;
+            _filmPersonRepository = filmPersonRepository;
+            _filmsRepository = filmsRepository;
+            _personsRepository = personsRepository;
         }
 
         // GET: FilmPersons
         public async Task<IActionResult> Index()
         {
-            return View(await _context.FilmPersons.ToListAsync());
+            return View(await _filmPersonRepository.GetAll().ToListAsync());
         }
 
         // GET: FilmPersons/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var filmPerson = await _context.FilmPersons
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var filmPerson = await _filmPersonRepository.GetByIdAsync(id);
             if (filmPerson == null)
             {
                 return NotFound();
@@ -53,8 +52,8 @@ namespace Net_CampMyProject.Controllers
 
         private void InitilizeSelectLists(int? selectedPersonId = null, int? selectedFilmId = null)
         {
-            ViewData[nameof(FilmPerson.PersonId)] = new SelectList(_context.Persons, nameof(Person.Id), nameof(Person.Name), selectedPersonId);
-            ViewData[nameof(FilmPerson.FilmId)] = new SelectList(_context.Films, nameof(Film.Id), nameof(Film.Title), selectedFilmId);
+            ViewData[nameof(FilmPerson.PersonId)] = new SelectList(_personsRepository.GetAll(), nameof(Person.Id), nameof(Person.Name), selectedPersonId);
+            ViewData[nameof(FilmPerson.FilmId)] = new SelectList(_filmsRepository.GetAll(), nameof(Film.Id), nameof(Film.Title), selectedFilmId);
         }
 
         // POST: FilmPersons/Create
@@ -66,8 +65,7 @@ namespace Net_CampMyProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(filmPerson);
-                await _context.SaveChangesAsync();
+                await _filmPersonRepository.CreateAsync(filmPerson);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -77,14 +75,9 @@ namespace Net_CampMyProject.Controllers
         }
 
         // GET: FilmPersons/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var filmPerson = await _context.FilmPersons.FindAsync(id);
+            var filmPerson = await _filmPersonRepository.GetByIdAsync(id);
             if (filmPerson == null)
             {
                 return NotFound();
@@ -111,19 +104,16 @@ namespace Net_CampMyProject.Controllers
             {
                 try
                 {
-                    _context.Update(filmPerson);
-                    await _context.SaveChangesAsync();
+                    await _filmPersonRepository.UpdateAsync(filmPerson);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!FilmPersonExists(filmPerson.Id))
+                    if (!await _filmPersonRepository.ExistsAsync(filmPerson.Id))
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -134,15 +124,9 @@ namespace Net_CampMyProject.Controllers
         }
 
         // GET: FilmPersons/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var filmPerson = await _context.FilmPersons
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var filmPerson = await _filmPersonRepository.GetByIdAsync(id);
             if (filmPerson == null)
             {
                 return NotFound();
@@ -156,15 +140,9 @@ namespace Net_CampMyProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var filmPerson = await _context.FilmPersons.FindAsync(id);
-            _context.FilmPersons.Remove(filmPerson);
-            await _context.SaveChangesAsync();
+            var filmPerson = await _filmPersonRepository.GetByIdAsync(id);
+            await _filmPersonRepository.DeleteByIdAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool FilmPersonExists(int id)
-        {
-            return _context.FilmPersons.Any(e => e.Id == id);
         }
     }
 }

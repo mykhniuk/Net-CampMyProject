@@ -27,60 +27,24 @@
                     @if (User.Identity.Name != null)
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-white-50" asp-controller="Films" asp-action="Index" asp-route-filter="Liked">My liked films</a>
+                            <a class="nav-link text-white-50" asp-controller="Films" asp-action="List" asp-route-filter="Liked">My liked films</a>
                         </li>
                     }
                 </ul>
                 <partial name="_LoginPartial" />
-                
             </div>
         </div>
-        
     </nav>
 </header>
 
 <div class="container">
-    <div class="row justify-content-md-center">
-        <div class="col-md-auto">
+    <div class="row">
+        <div class="col-md-9">
             @RenderBody()
         </div>
-        @if (isAdmin)
-        {
-            <div class="col col-lg-2">
-                test
-
-
-
-                <div class="bg-dark text-center">
-                    <div class="text-white">
-                        <h4>Admin panel</h4>
-                    </div>
-                </div>
-                <ul>
-                    <li>
-                        <a asp-area="" asp-controller="Films" asp-action="Create">Create new film</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li>
-                        <a asp-area="" asp-controller="Comments" asp-action="Index">Comments</a>
-                    </li>
-                    <li>
-                        <a asp-area="" asp-controller="Persons" asp-action="Index">Persons</a>
-                    </li>
-                    <li>
-                        <a asp-area="" asp-controller="FilmPersons" asp-action="Index">F.Persons</a>
-                    </li>
-                    <li>
-                        <a asp-area="" asp-controller="FilmRatings" asp-action="Index">F.Ratings</a>
-                    </li>
-                    <li>
-                        <a asp-area="" asp-controller="Genres" asp-action="Index">F.Ratings</a>
-                    </li>
-                </ul>
-
-            </div>
-        }
+        <div class="col-md-3">
+            @await Component.InvokeAsync("RightPanel")
+        </div>
     </div>
 </div>
 

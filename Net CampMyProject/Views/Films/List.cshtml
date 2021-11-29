@@ -1,28 +1,34 @@
 ﻿@using Net_CampMyProject.Data.Models;
+@using Microsoft.Data.SqlClient
 @model Net_CampMyProject.Models.ViewModels.FilmsIndexViewModel
 
 @{
     ViewData["Title"] = "Films";
 
     var isAdmin = User.IsInRole(Roles.Admin);
-    
+    var revertedSortOrder = Model.SortOrder == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending;
 }
 
 <div>
-    <div class="col-lg-9 text-right">
+    <div class="text-right">
         <div class="dropdown mb-2 mr-1">
             <strong>Sort by:</strong>
-            <button class="btn btn-secondary dropdown-toggle w-20 h-25" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                @ViewData["Message"]
+            <button class="btn btn-secondary dropdown-toggle w-25 h-25" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                @Model.SortBy
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <span class="dropdown-item">@Html.ActionLink("Title", "Index", new { sortBy = nameof(Film.Title), sortOrder = ViewBag.SortOrder, page = 1 })</span>
-                <span class="dropdown-item">@Html.ActionLink("Released", "Index", new { sortBy = nameof(Film.ReleaseDate), sortOrder = ViewBag.SortOrder, page = 1 })</span>
+                <span class="dropdown-item">
+                    <a asp-controller="Films" asp-action="List" asp-route-filter="@Model.Filter" asp-route-sortBy="@nameof(Film.Title)" asp-route-sortOrder="@revertedSortOrder" asp-route-page="1">Title</a>
+                </span>
+                <span class="dropdown-item">
+                    <a asp-controller="Films" asp-action="List" asp-route-filter="@Model.Filter" asp-route-sortBy="@nameof(Film.ReleaseDate)" asp-route-sortOrder="@revertedSortOrder" asp-route-page="1">Release Date</a>
+                </span>
             </div>
         </div>
     </div>
-    <div class="col-lg-9">
-        @foreach (Film film in Model.Films)
+
+    <div>
+        @foreach (var film in Model.Films)
         {
             <div class="shadow-lg p-3 mb-2 bg-white rounded">
                 <div class="row mx-md-n5">
@@ -37,11 +43,11 @@
                                 <div class="col-8 col-sm-6">
                                     <div class="text-center">
                                         <span>Likes</span>
-                                        @film.MyRatings.Where(c => c.MyRating == true).Count()
+                                        @film.MyRatings.Count(c => c.MyRating)
                                     </div>
                                     <div class="text-center">
                                         <span>Dislikes</span>
-                                        @film.MyRatings.Where(c => c.MyRating == false).Count()
+                                        @film.MyRatings.Count(c => !c.MyRating)
                                     </div>
                                 </div>
                             </div>
@@ -66,6 +72,7 @@
                                             <strong>
                                                 @nameof(film.Genres):
                                             </strong>
+
                                             @foreach (var i in film.Genres)
                                             {
                                                 <span>
@@ -113,12 +120,14 @@
                                     }
                                 </div>
                             </div>
-                            <div>
-                                <details>
-                                    <summary>@nameof(film.Description)...</summary>
-                                    <p>@film.Description</p>
-                                </details>
-                            </div>
+                            @*<div class=" class="row my-2"">
+                                <div>
+                                    <details>
+                                        <summary>@nameof(film.Description)...</summary>
+                                        <p class="text-md-center">@film.Description</p>
+                                    </details>
+                                </div>
+                            </div>*@
                             <div>
                                 @if (isAdmin)
                                 {
@@ -133,28 +142,33 @@
         }
 
     </div>
+    <div class="p-4 text-center">
+        @if (Model.PaginationPageViewModel.HasPreviousPage)
+        {
+            <a asp-action="Index"
+               asp-route-page="@(Model.PaginationPageViewModel.PageNumber - 1)"
+               class="btn btn-outline-dark">
+                <i class="glyphicon glyphicon-chevron-left"></i>
+                Previous page
+            </a>
 
-<div class="col-lg-9 p-3 mb-2 text-center">
-    @if (Model.PaginationPageViewModel.HasPreviousPage)
-    {
-        <a asp-action="Index"
-           asp-route-page="@(Model.PaginationPageViewModel.PageNumber - 1)"
-           class="btn btn-outline-dark">
-            <i class="glyphicon glyphicon-chevron-left"></i>
-            Previous page
-        </a>
+        }
+        @if (Model.PaginationPageViewModel.HasNextPage)
+        {
 
-    }
-    @if (Model.PaginationPageViewModel.HasNextPage)
-    {
+            <a asp-action="Index"
+               asp-route-page="@(Model.PaginationPageViewModel.PageNumber + 1)"
+               class="btn btn-outline-dark">
 
-        <a asp-action="Index"
-           asp-route-page="@(Model.PaginationPageViewModel.PageNumber + 1)"
-           class="btn btn-outline-dark">
-
-            <i class="glyphicon glyphicon-chevron-right"></i>
-            Next page
-        </a>
-    }
+                <i class="glyphicon glyphicon-chevron-right"></i>
+                Next page
+            </a>
+        }
+    </div>
 </div>
-</div>
+
+
+
+
+
+

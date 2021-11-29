@@ -8,39 +8,33 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Net_CampMyProject.Data;
 using Net_CampMyProject.Data.Models;
+using Net_CampMyProject.Services.Interfaces;
 
 namespace Net_CampMyProject.Controllers
 {
     public class MyFilmRatingsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IMyRatingsRepository _myRatingsRepository;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IFilmsRepository _filmsRepository;
 
-        public MyFilmRatingsController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public MyFilmRatingsController(IMyRatingsRepository myRatingsRepository, UserManager<IdentityUser> userManager, IFilmsRepository filmsRepository)
         {
-            _context = context;
+            _myRatingsRepository = myRatingsRepository;
             _userManager = userManager;
+            _filmsRepository = filmsRepository;
         }
 
         // GET: MyFilmRatings
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.MyFilmRating.Include(m => m.Author).Include(m => m.Film);
-            return View(await applicationDbContext.ToListAsync());
+            return View(await _myRatingsRepository.GetAll().ToListAsync());
         }
 
         // GET: MyFilmRatings/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var myFilmRating = await _context.MyFilmRating
-                .Include(m => m.Author)
-                .Include(m => m.Film)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var myFilmRating = await _myRatingsRepository.GetByIdAsync(id);                
             if (myFilmRating == null)
             {
                 return NotFound();
@@ -61,12 +55,11 @@ namespace Net_CampMyProject.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,MyRating,FilmId,AuthorId")] MyFilmRating myFilmRating)
+        public async Task<IActionResult> Create(MyFilmRating myFilmRating)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(myFilmRating);
-                await _context.SaveChangesAsync();
+                await _myRatingsRepository.CreateAsync(myFilmRating);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -75,14 +68,9 @@ namespace Net_CampMyProject.Controllers
         }
 
         // GET: MyFilmRatings/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var myFilmRating = await _context.MyFilmRating.FindAsync(id);
+            var myFilmRating = await _myRatingsRepository.GetByIdAsync(id);
             if (myFilmRating == null)
             {
                 return NotFound();
@@ -97,7 +85,7 @@ namespace Net_CampMyProject.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,MyRating,FilmId,AuthorId")] MyFilmRating myFilmRating)
+        public async Task<IActionResult> Edit(int id, MyFilmRating myFilmRating)
         {
             if (id != myFilmRating.Id)
             {
@@ -108,19 +96,16 @@ namespace Net_CampMyProject.Controllers
             {
                 try
                 {
-                    _context.Update(myFilmRating);
-                    await _context.SaveChangesAsync();
+                    await _myRatingsRepository.UpdateAsync(myFilmRating);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MyFilmRatingExists(myFilmRating.Id))
+                    if (!await _myRatingsRepository.ExistsAsync(myFilmRating.Id))
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -130,22 +115,14 @@ namespace Net_CampMyProject.Controllers
         }
         private void InitializeSelectLists()
         {
-            ViewData[nameof(MyFilmRating.AuthorId)] = new SelectList(_context.Users, nameof(IdentityUser.Id), nameof(IdentityUser.UserName));
-            ViewData[nameof(MyFilmRating.FilmId)] = new SelectList(_context.Films, nameof(Film.Id), nameof(Film.Id));
+            ViewData[nameof(MyFilmRating.AuthorId)] = new SelectList(_userManager.Users, nameof(IdentityUser.Id), nameof(IdentityUser.UserName));
+            ViewData[nameof(MyFilmRating.FilmId)] = new SelectList(_filmsRepository.GetAll(), nameof(Film.Id), nameof(Film.Title));
         }
 
         // GET: MyFilmRatings/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var myFilmRating = await _context.MyFilmRating
-                .Include(m => m.Author)
-                .Include(m => m.Film)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var myFilmRating = await _myRatingsRepository.GetByIdAsync(id);
             if (myFilmRating == null)
             {
                 return NotFound();
@@ -159,27 +136,21 @@ namespace Net_CampMyProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var myFilmRating = await _context.MyFilmRating.FindAsync(id);
-            _context.MyFilmRating.Remove(myFilmRating);
-            await _context.SaveChangesAsync();
+            var myFilmRating = await _myRatingsRepository.GetByIdAsync(id);
+            await _myRatingsRepository.DeleteByIdAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool MyFilmRatingExists(int id)
-        {
-            return _context.MyFilmRating.Any(e => e.Id == id);
-        }
-        public async Task<IActionResult> CreateOrUpdate([Bind("Id,MyRating,FilmId,AuthorId")] MyFilmRating myFilmRating)
+        public async Task<IActionResult> CreateOrUpdate(MyFilmRating myFilmRating)
         {
             myFilmRating.AuthorId = _userManager.GetUserId(User);
-            var dbMyFilmRating = await _context.MyFilmRating.Include(c => c.Film).Include(a => a.Author).FirstOrDefaultAsync(mr => mr.FilmId == myFilmRating.FilmId && mr.AuthorId == myFilmRating.AuthorId);
+            var dbMyFilmRating = await _myRatingsRepository.CreateOrUpdateAsync(myFilmRating);
             
                 if (dbMyFilmRating == null)
                 {
 
                     myFilmRating.AuthorId = _userManager.GetUserId(User);
-                    _context.Add(myFilmRating);
-                    await _context.SaveChangesAsync();
+                    await _myRatingsRepository.CreateAsync(myFilmRating);
                     return RedirectToAction(nameof(Details), "Films", new {id = myFilmRating.FilmId});
 
                 }
@@ -187,14 +158,9 @@ namespace Net_CampMyProject.Controllers
                 {
                     dbMyFilmRating.AuthorId = myFilmRating.AuthorId;
                     dbMyFilmRating.MyRating = myFilmRating.MyRating;
-                    _context.Update(dbMyFilmRating);
-                    await _context.SaveChangesAsync();
+                    await _myRatingsRepository.UpdateAsync(dbMyFilmRating);
                     return RedirectToAction(nameof(Details), "Films", new {id = dbMyFilmRating.FilmId});
                 }
-
-            InitializeSelectLists();
-
-            return View(myFilmRating);
         }
         
     }

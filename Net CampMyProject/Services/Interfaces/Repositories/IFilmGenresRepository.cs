@@ -2,7 +2,7 @@
 
 namespace Net_CampMyProject.Services.Interfaces
 {
-    public interface IPersonsRepository : IRepositoryBase<Person>
+    public interface IFilmGenresRepository : IRepositoryBase<FilmGenre>
     {
     }
 }

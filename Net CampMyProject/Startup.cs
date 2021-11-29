@@ -49,6 +49,12 @@ namespace Net_CampMyProject
             services.AddScoped<IGenresRepository, GenresRepository>();
             services.AddScoped<ICommentsRepository, CommentsRepository>();
             services.AddScoped<IPersonsRepository, PersonsRepository>();
+            services.AddScoped<IFilmRatingSourcesRepository, FilmRatingSourcesRepository>();
+            services.AddScoped<IFilmRatingsRepository, FilmRatingsRepository>();
+            services.AddScoped<IFilmGenresRepository, FilmGenresRepository>();
+            services.AddScoped<IMyRatingsRepository, MyRatingsRepository>();
+            services.AddScoped<IFilmPersonsRepository, FilmPersonsRepository>();
+            services.AddScoped<IGenresRepository, GenresRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

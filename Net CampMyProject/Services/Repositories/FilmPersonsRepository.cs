@@ -4,9 +4,9 @@ using Net_CampMyProject.Services.Interfaces;
 
 namespace Net_CampMyProject.Services
 {
-    public class PersonsRepository : RepositoryBase<Person>, IPersonsRepository
+    public class FilmPersonsRepository : RepositoryBase<FilmPerson>, IFilmPersonsRepository
     {
-        public PersonsRepository(ApplicationDbContext db) : base(db)
+        public FilmPersonsRepository(ApplicationDbContext db) : base(db)
         {
         }
     }

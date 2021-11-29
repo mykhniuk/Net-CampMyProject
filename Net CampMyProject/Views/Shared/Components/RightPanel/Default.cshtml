@@ -1,0 +1,68 @@
+﻿@model IEnumerable<Net_CampMyProject.Data.Models.Film>
+
+@{
+    var isAdmin = User.IsInRole(Roles.Admin);
+}
+
+@if (isAdmin)
+{
+    <div>
+     <div class="bg-dark text-center">
+         <div class="text-white">
+             <h4>Admin panel</h4>
+         </div>
+     </div>
+     <ul>
+         <li>
+             <a asp-area="" asp-controller="Films" asp-action="Create">Create new film</a>
+         </li>
+     </ul>
+     <ul>
+         <li>
+             <a asp-area="" asp-controller="Comments" asp-action="Index">Comments</a>
+         </li>
+         <li>
+             <a asp-area="" asp-controller="Persons" asp-action="Index">Persons</a>
+         </li>
+         <li>
+             <a asp-area="" asp-controller="FilmPersons" asp-action="Index">F.Persons</a>
+         </li>
+         <li>
+             <a asp-area="" asp-controller="FilmRatings" asp-action="Index">F.Ratings</a>
+         </li>
+         <li>
+             <a asp-area="" asp-controller="Genres" asp-action="Index">Genres</a>
+         </li>
+     </ul>
+ </div>
+
+}
+
+
+<h2>TOP 10</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Title
+            </th>
+            <th>
+                Year
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ReleaseDate.Year)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

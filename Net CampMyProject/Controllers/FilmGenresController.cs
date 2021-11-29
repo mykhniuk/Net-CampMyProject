@@ -1,42 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Net_CampMyProject.Data;
 using Net_CampMyProject.Data.Models;
+using Net_CampMyProject.Services.Interfaces;
 
 namespace Net_CampMyProject.Controllers
 {
     public class FilmGenresController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IFilmGenresRepository _filmGenresRepository;
+        private readonly IFilmsRepository _filmsRepository;
+        private readonly IGenresRepository _genresRepository;
 
-        public FilmGenresController(ApplicationDbContext context)
+        public FilmGenresController(IFilmGenresRepository filmGenresRepository, IFilmsRepository filmsRepository, IGenresRepository genresRepository)
         {
-            _context = context;
+            _filmGenresRepository = filmGenresRepository;
+            _filmsRepository = filmsRepository;
+            _genresRepository = genresRepository;
         }
 
         // GET: FilmGenres
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.FilmGenres.Include(f => f.Film);
-            return View(await applicationDbContext.ToListAsync());
+            return View(await _filmGenresRepository.GetAll().ToListAsync());
         }
 
         // GET: FilmGenres/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var filmGenre = await _context.FilmGenres
-                .Include(f => f.Film)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var filmGenre = await _filmGenresRepository.GetByIdAsync(id);
             if (filmGenre == null)
             {
                 return NotFound();
@@ -53,8 +46,8 @@ namespace Net_CampMyProject.Controllers
         }
         private void InitilizeSelectLists(int? selectedGenreId = null, int? selectedFilmId = null)
         {
-            ViewData[nameof(FilmGenre.GenreId)] = new SelectList(_context.Genres, nameof(Genre.Id), nameof(Genre.GenreType), selectedGenreId);
-            ViewData[nameof(FilmGenre.FilmId)] = new SelectList(_context.Films, nameof(Film.Id), nameof(Film.Title), selectedFilmId);
+            ViewData[nameof(FilmGenre.GenreId)] = new SelectList(_genresRepository.GetAll(), nameof(Genre.Id), nameof(Genre.GenreType), selectedGenreId);
+            ViewData[nameof(FilmGenre.FilmId)] = new SelectList(_filmsRepository.GetAll(), nameof(Film.Id), nameof(Film.Title), selectedFilmId);
         }
 
         // POST: FilmGenres/Create
@@ -66,8 +59,7 @@ namespace Net_CampMyProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(filmGenre);
-                await _context.SaveChangesAsync();
+                await _filmGenresRepository.CreateAsync(filmGenre);
                 return RedirectToAction(nameof(Index));
             }
             InitilizeSelectLists();
@@ -75,14 +67,9 @@ namespace Net_CampMyProject.Controllers
         }
 
         // GET: FilmGenres/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var filmGenre = await _context.FilmGenres.FindAsync(id);
+            var filmGenre = await _filmGenresRepository.GetByIdAsync(id);
             if (filmGenre == null)
             {
                 return NotFound();
@@ -107,19 +94,16 @@ namespace Net_CampMyProject.Controllers
             {
                 try
                 {
-                    _context.Update(filmGenre);
-                    await _context.SaveChangesAsync();
+                    await _filmGenresRepository.UpdateAsync(filmGenre);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!FilmGenreExists(filmGenre.Id))
+                    if (!await _filmsRepository.ExistsAsync(filmGenre.Id))
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -128,16 +112,9 @@ namespace Net_CampMyProject.Controllers
         }
 
         // GET: FilmGenres/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var filmGenre = await _context.FilmGenres
-                .Include(f => f.Film)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var filmGenre = await _filmGenresRepository.GetByIdAsync(id);
             if (filmGenre == null)
             {
                 return NotFound();
@@ -151,15 +128,9 @@ namespace Net_CampMyProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var filmGenre = await _context.FilmGenres.FindAsync(id);
-            _context.FilmGenres.Remove(filmGenre);
-            await _context.SaveChangesAsync();
+            var filmGenre = await _filmGenresRepository.GetByIdAsync(id);
+            await _filmGenresRepository.DeleteByIdAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool FilmGenreExists(int id)
-        {
-            return _context.FilmGenres.Any(e => e.Id == id);
         }
     }
 }

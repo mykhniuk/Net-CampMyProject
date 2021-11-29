@@ -1,9 +1,7 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Net_CampMyProject.Data;
 using Net_CampMyProject.Data.Models;
 using Net_CampMyProject.Services.Interfaces;
 
@@ -22,7 +20,7 @@ namespace Net_CampMyProject.Controllers
         // GET: Persons
         public async Task<IActionResult> Index()
         {
-            return View(await _personRepository.GetAllPersonListAsync());
+            return View(await _personRepository.GetAll().ToListAsync());
         }
 
         // GET: Persons/Details/5
