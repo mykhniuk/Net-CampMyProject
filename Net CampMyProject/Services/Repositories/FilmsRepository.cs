@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
@@ -53,6 +54,20 @@ namespace Net_CampMyProject.Services
                 Count = await filmsQuery.CountAsync(),
                 Films = await filmsQuery.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync()
             };
+        }
+
+        public async Task<List<Film>> SearchByKeyWordAsync(string keyWord)
+        {
+            return await GetAll().AsSplitQuery()
+                .Include(f => f.Comments)
+                .ThenInclude(c => c.Author)
+                .Include(c => c.Persons)
+                .ThenInclude(c => c.Person)
+                .Include(c => c.Genres)
+                .ThenInclude(k => k.Genre)
+                .Include(c => c.Ratings)
+                .ThenInclude(c => c.Source)
+                .Include(r => r.MyRatings).Where(f => f.Title.Contains(keyWord) | f.Description.Contains(keyWord)).ToListAsync();
         }
 
         public override async Task<Film> GetByIdAsync(int id)

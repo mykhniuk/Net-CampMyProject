@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -9,6 +10,7 @@ using Net_CampMyProject.Services.Interfaces;
 
 namespace Net_CampMyProject.Controllers
 {
+    [Authorize(Roles = Roles.Admin)]
     public class FilmsController : BaseController<Film>
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -21,27 +23,46 @@ namespace Net_CampMyProject.Controllers
         }
 
         // GET: Films
-        public async Task<IActionResult> List(FilmsFilterType filter, string sortBy = nameof(Film.Title), SortOrder sortOrder = SortOrder.Ascending, int page = 1, int pageSize = 5)
+        [AllowAnonymous]
+        public async Task<IActionResult> List(FilmsFilterType filter, string sortBy = nameof(Film.Title), SortOrder sortOrder = SortOrder.Ascending, int page = 1, int pageSize = 5, string keyWord = null)
         {
+            var viewModel = new FilmsIndexViewModel();
             var authorId = _userManager.GetUserId(User);
 
             var filteredFilmsResult = await _filmsRepository.GetFilteredAsync(filter, sortBy, sortOrder, page, pageSize, authorId);
-
-            var viewModel = new FilmsIndexViewModel
+            if (keyWord == null)
             {
-                PaginationPageViewModel = new PaginationPageViewModel(filteredFilmsResult.Count, page, pageSize),
-                Films = filteredFilmsResult.Films,
-                Filter = filter,
-                SortOrder = sortOrder,
-                SortBy = sortBy,
-            };
+                viewModel = new FilmsIndexViewModel
+                {
+                    PaginationPageViewModel = new PaginationPageViewModel(filteredFilmsResult.Count, page, pageSize),
+                    Films = filteredFilmsResult.Films,
+                    Filter = filter,
+                    SortOrder = sortOrder,
+                    SortBy = sortBy,
+                };
+            }
+
+            if (keyWord == null) return View(viewModel);
+            viewModel.Films = await _filmsRepository.SearchByKeyWordAsync(keyWord);
+            viewModel.Filter = FilmsFilterType.All;
+            viewModel.SortOrder = SortOrder.Ascending;
+            viewModel.PaginationPageViewModel =
+                new PaginationPageViewModel(viewModel.Films.Count, page, pageSize);
+
 
             return View(viewModel);
         }
 
+        [AllowAnonymous]
         public override async Task<IActionResult> Index()
         {
             return await Task.FromResult<IActionResult>(RedirectToAction(nameof(List), new {filter = FilmsFilterType.All}));
+        }
+
+        [AllowAnonymous]
+        public override Task<IActionResult> Details(int id)
+        {
+            return base.Details(id);
         }
     }
 }

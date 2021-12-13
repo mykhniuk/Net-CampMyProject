@@ -241,13 +241,15 @@
                 }
             </dd>
         }
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Story)
-        </dt>
-        <dd class="col-sm-10">
-            @Model.Story
-        </dd>
-
+        @if (Model.Story != null)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Story)
+            </dt>
+            <dd class="col-sm-10">
+                @Model.Story
+            </dd>
+        }
     </dl>
 
     <div>
@@ -260,14 +262,21 @@
     <div class="row">
         <div class="col-md-4">
             <form asp-action="CreateOrUpdate" asp-controller="MyFilmRatings">
+
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                <input hidden="hidden" name="@nameof(MyFilmRating.FilmId)" value="@Model.Id" class="form-control" />
-                <input hidden="hidden" name="@nameof(MyFilmRating.Author)" value="@User.Identity" class="form-control" />
+                <input hidden="hidden" name="@nameof(MyFilmRating.FilmId)" value="@Model.Id" class="form-control"/>
+
                 <div class="form-group form-check">
                     <div class="form-group">
-                        <button class="btn btn-success btn-lg" name="@nameof(MyFilmRating.MyRating)" value="true" title="Likes">@Model.MyRatings.Where(c => c.MyRating == true).Count()</button> :
-                        <button class="btn btn-danger btn-lg" name="@nameof(MyFilmRating.MyRating)" value="false" title="Dislikes">@Model.MyRatings.Where(c => c.MyRating == false).Count()</button>
+
+                        @{
+                            var likesCount = Model.MyRatings.Count(c => c.MyRating);
+                            var dislikesCount = Model.MyRatings.Count(c => !c.MyRating);
+                        }
+
+                        <button class="btn btn-success btn-lg" name="@nameof(MyFilmRating.MyRating)" value="true" title="Likes">@likesCount</button> :
+                        <button class="btn btn-danger btn-lg" name="@nameof(MyFilmRating.MyRating)" value="false" title="Dislikes">@dislikesCount</button>
                     </div>
                 </div>
             </form>
@@ -281,9 +290,7 @@
         </div>
     }
 
-
-
-    <h4>Add Comment Form</h4>
+    <h4>Add Comment:</h4>
 
     <div class="form-group">
         <form asp-action="Create" asp-controller="Comments">
@@ -291,62 +298,40 @@
             <input hidden="hidden" name="@nameof(Comment.FilmId)" value="@Model.Id" class="form-control" />
 
             <div class="form-group">
-                <label for="@nameof(Comment.Content)">Comment text:</label>
-                <textarea class="form-control" name="@nameof(Comment.Content)" rows="3"></textarea>
+                <textarea class="form-control" name="@nameof(Comment.Content)" rows="3" placeholder="Write your comment"></textarea>
             </div>
 
-            <div class="form-group">
-                <input type="submit" value="Add comment" class="btn btn-danger" />
+            <div class="form-group text-right">
+                <input type="submit" value="Add comment" class="btn btn-primary" />
             </div>
         </form>
     </div>
+    @if (Model.Comments.Count != 0)
+    {
+        <h2>Comments(@Model.Comments.Count)</h2>
+    }
+    @foreach (var item in Model.Comments.OrderByDescending(c => c.DateTime).Take(10))
+    {
+        <div class="shadow-lg p-3 mb-2 bg-white rounded">
+            <div class="row mx-md-n5">
+                <div class="col px-md-5">
+                    <div class="p-3 border bg-light">
+                        <div class="media-body">
+                            <h4> @Html.DisplayFor(modelItem => item.Author.UserName) </h4>
+                            <p> @Html.DisplayFor(modelItem => item.Content)</p>
+                        </div>
+                        <div class="text-right"><small><i>Posted on  @Html.DisplayFor(modelItem => item.DateTime)</i></small></div>
+                        <div>
+                            @if (User.Identity.Name == item.Author.UserName | isAdmin)
+                            {
+                                <a asp-controller="Comments" asp-action="Edit" asp-route-id="@item.Id">Edit |</a>
+                                <a asp-controller="Comments" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                            }
+                        </div>
 
-
-
-    <h2>Comments</h2>
-
-    <table class="table">
-        <thead>
-            <tr>
-                @if (isAdmin)
-                {
-                    <th></th>
-                }
-                <th>
-                    DateTime
-                </th>
-                <th>
-                    Author
-                </th>
-                <th>
-                    Content
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Comments.OrderByDescending(c => c.DateTime).Take(10))
-            {
-                <tr>
-                    @if (isAdmin)
-                    {
-                        <td>
-                            <a asp-action="Edit" asp-controller="Comments" asp-route-id="@item.Id">E</a> |
-                            <a asp-action="Details" asp-controller="Comments" asp-route-id="@item.Id">D</a> |
-                            <a asp-action="Delete" asp-controller="Comments" asp-route-id="@item.Id">R</a>
-                        </td>
-                    }
-                    <td>
-                        @Html.DisplayFor(modelItem => item.DateTime)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Author.UserName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Content)
-                    </td>
-
-                </tr>
-            }
-        </tbody>
-    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>

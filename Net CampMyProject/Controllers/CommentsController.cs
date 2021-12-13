@@ -50,8 +50,77 @@ namespace Net_CampMyProject.Controllers
                 comment.AuthorId = _userManager.GetUserId(User);
                 comment.DateTime = DateTime.Now;
             }
+            
+            await base.Create(comment);
 
-            return await base.Create(comment);
+            return RedirectToAction(nameof(Details), "Films", new { id = comment?.FilmId });
+        }
+
+        public override async Task<IActionResult> Edit(int id)
+        {
+            var isAdmin = User.IsInRole(Roles.Admin);
+
+            var comment = await _commentsRepository.GetByIdAsync(id);
+            if (comment == null)
+                return NotFound();
+
+            if(comment.AuthorId != _userManager.GetUserId(User) && !isAdmin)
+                return Forbid();
+
+            return await base.Edit(id);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public override async Task<IActionResult> Edit(int id, Comment entity)
+        {
+            var isAdmin = User.IsInRole(Roles.Admin);
+
+            var comment = await _commentsRepository.GetByIdAsync(id);
+            if (comment == null)
+                return NotFound();
+
+            if(comment.Id != entity.Id || comment.AuthorId != entity.AuthorId)
+                return BadRequest();
+
+            if (comment.AuthorId != _userManager.GetUserId(User) && !isAdmin)
+                return Forbid();
+
+            await base.Edit(id, entity);
+
+            return RedirectToAction(nameof(Details), "Films", new {id = comment.FilmId});
+        }
+
+        public override async Task<IActionResult> Delete(int id)
+        {
+            var isAdmin = User.IsInRole(Roles.Admin);
+
+            var comment = await _commentsRepository.GetByIdAsync(id);
+            if (comment == null)
+                return NotFound();
+
+            if (comment.AuthorId != _userManager.GetUserId(User) && !isAdmin)
+                return Forbid();
+
+            return await base.Delete(id);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public override async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var isAdmin = User.IsInRole(Roles.Admin);
+
+            var comment = await _commentsRepository.GetByIdAsync(id);
+            if (comment == null)
+                return NotFound();
+
+            if (comment.AuthorId != _userManager.GetUserId(User) && !isAdmin)
+                return Forbid();
+
+            await base.DeleteConfirmed(id);
+
+            return RedirectToAction(nameof(Details), "Films", new { id = comment.FilmId });
         }
     }
 }

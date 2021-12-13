@@ -264,14 +264,14 @@ namespace FilmsParser.Extensions
 
             return result;
         }
-        public static string GetCurrentUrl(this IWebDriver driver)
+        public static string GetCurrentUrlAsync(this IWebDriver driver)
         {
             return driver.Url;
         }
-        public static List<FilmRatingRatingSourceRelated> ParsFilmRating(this ChromeDriver driver)
+        public static List<FilmRatingRatingSourceRelated> ParsFilmRating(this ChromeDriver driver, Film film)
         {
             var result = new List<FilmRatingRatingSourceRelated>();
-            var currentUrl = driver.GetCurrentUrl();
+            var currentUrl = driver.GetCurrentUrlAsync();
             var urlForGetRating = currentUrl.Replace("=uk", "=en");
             driver.OpenUrlInNewTab(urlForGetRating);
             driver.Navigate().GoToUrl(urlForGetRating);
@@ -284,7 +284,7 @@ namespace FilmsParser.Extensions
                     var newRatingSource = new FilmRatingRatingSourceRelated();
                     var newRatingSource1 = new FilmRatingSource();
                     newRatingSource1.ResourceWebsite = element.GetAttribute("href");
-                    newRatingSource.RatingValue = element.Text;
+                    newRatingSource.RatingValue = string.Join("", element.Text.Where(c => char.IsDigit(c) | char.IsPunctuation(c))); 
                     newRatingSource.filmRatingSource = newRatingSource1;
                     result.Add(newRatingSource);
                 }
@@ -296,8 +296,8 @@ namespace FilmsParser.Extensions
             {
                 var newRatingSource = new FilmRatingRatingSourceRelated();
                 var newRatingSource1 = new FilmRatingSource();
-                newRatingSource1.ResourceWebsite = "https://www.google.com/";
-                newRatingSource.RatingValue = googleRatingsLink.Text;
+                newRatingSource1.ResourceWebsite = "https://www.google.com.ua/search?q=" + film.Title;
+                newRatingSource.RatingValue = newRatingSource.RatingValue = string.Join("", googleRatingsLink.Text.Where(c => char.IsDigit(c) | char.IsPunctuation(c))); ;
                 newRatingSource.filmRatingSource = newRatingSource1;
                 result.Add(newRatingSource);
             }

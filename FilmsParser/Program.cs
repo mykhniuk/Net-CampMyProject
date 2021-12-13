@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FilmsParser.Extensions;
-using Microsoft.EntityFrameworkCore.Internal;
 using Net_CampMyProject.Data.Models;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -17,7 +15,7 @@ namespace FilmsParser
         private static readonly string SearchStringPrefix = "Фільми";
         private static readonly string AcceptKeyWord = "Прийняти";
         private static readonly string SearchKeyword = "Пошук";
-        private static readonly int StartFromYear = 2020;
+        private static readonly int StartFromYear = 2018;
 
         private static readonly CultureInfo CultureInfo = new("uk-UA");
         private static readonly string imagesFolderPath = @"E:\New folder (3)\Net CampMyProject\wwwroot\img\";
@@ -121,7 +119,7 @@ namespace FilmsParser
                     }
                     await Task.Delay(3000);
                     //RATINGS
-                    foreach (var rating in driver.ParsFilmRating())
+                    foreach (var rating in driver.ParsFilmRating(newFilm))
                     {
                         var ratingSource = await apiClient.AddOrGetRatingSource(rating.filmRatingSource.ResourceWebsite);
                         await apiClient.AddFilmRating(addedFilm.Id, ratingSource.Id, rating.RatingValue);

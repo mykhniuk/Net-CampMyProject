@@ -5,6 +5,6 @@ namespace Net_CampMyProject.Services.Interfaces
 {
     public interface IMyRatingsRepository : IRepositoryBase<MyFilmRating>
     {
-        Task<MyFilmRating> CreateOrUpdateAsync(MyFilmRating myFilmRating);
+        Task CreateOrUpdateAsync(MyFilmRating myFilmRating);
     }
 }

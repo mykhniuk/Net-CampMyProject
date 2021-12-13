@@ -1,0 +1,77 @@
+﻿@model IEnumerable<Net_CampMyProject.ViewComponent.TopFilmsViewModel>
+
+@{
+    var isAdmin = User.IsInRole(Roles.Admin);
+}
+
+
+<div>
+    <div class="bg-dark text-center">
+        <div class="text-white">
+            @if (isAdmin)
+            {
+                <h4>Admin panel</h4>
+            }
+            @if (isAdmin == false)
+            {
+                <h4>User panel</h4>
+            }
+        </div>
+    </div>
+    <div class="text-center"><partial name="_LoginPartial" /></div>
+    @if (isAdmin)
+    {
+        <ul>
+            <li>
+                <a asp-area="" asp-controller="Films" asp-action="Create">Create new film</a>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <a asp-area="" asp-controller="Comments" asp-action="Index">Comments</a>
+            </li>
+            <li>
+                <a asp-area="" asp-controller="Persons" asp-action="Index">Persons</a>
+            </li>
+            <li>
+                <a asp-area="" asp-controller="FilmPersons" asp-action="Index">F.Persons</a>
+            </li>
+            <li>
+                <a asp-area="" asp-controller="FilmRatings" asp-action="Index">F.Ratings</a>
+            </li>
+            <li>
+                <a asp-area="" asp-controller="Genres" asp-action="Index">Genres</a>
+            </li>
+        </ul>
+    }
+</div>
+
+
+
+<h2 class="text-center mt-lg-5">TOP 10</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Title
+            </th>
+            <th>
+                Rating
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-controller="Films" asp-action="Details" asp-route-id="@item.Film.Id">@Html.DisplayFor(modelItem => item.Film.Title)</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Rating)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

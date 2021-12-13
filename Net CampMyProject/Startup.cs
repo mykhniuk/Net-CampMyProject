@@ -121,7 +121,10 @@ namespace Net_CampMyProject
 
                 var result = await userManager.CreateAsync(adminUser, adminPwd);
                 if (result.Succeeded)
+                {
                     await userManager.AddToRoleAsync(adminUser, Roles.Admin);
+                    await userManager.AddToRoleAsync(adminUser, Roles.User);
+                }
             }
 
             if (!await roleManager.RoleExistsAsync(Roles.User))
@@ -129,6 +132,7 @@ namespace Net_CampMyProject
                 var role = new IdentityRole { Name = Roles.User };
                 await roleManager.CreateAsync(role);
             }
+
         }
     }
 }

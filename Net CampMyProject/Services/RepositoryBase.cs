@@ -24,7 +24,7 @@ namespace Net_CampMyProject.Services
 
         public virtual async Task<TEntity> GetByIdAsync(int id)
         {
-            return await _db.Set<TEntity>().FirstOrDefaultAsync(m => m.Id == id);
+            return await _db.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(m => m.Id == id);
         }
 
         public virtual async Task CreateAsync(TEntity entity)
@@ -41,7 +41,7 @@ namespace Net_CampMyProject.Services
 
         public virtual async Task<bool> ExistsAsync(int id)
         {
-            return await _db.Set<TEntity>().AnyAsync(e => e.Id == id);
+            return await _db.Set<TEntity>().AsNoTracking().AnyAsync(e => e.Id == id);
         }
 
         public virtual async Task DeleteByIdAsync(int id)

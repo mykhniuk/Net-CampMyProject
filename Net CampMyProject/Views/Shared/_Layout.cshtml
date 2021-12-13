@@ -30,8 +30,16 @@
                             <a class="nav-link text-white-50" asp-controller="Films" asp-action="List" asp-route-filter="Liked">My liked films</a>
                         </li>
                     }
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" asp-controller="News" asp-action="Index">News</a>
+                    </li>
                 </ul>
-                <partial name="_LoginPartial" />
+                <nav class="navbar navbar-light bg-dark">
+                    <form class="form-inline" asp-controller="Films" asp-action="List">
+                        <input class="form-control mr-sm-2" type="text" name="keyword" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-light text-white-50" type="submit">Search</button>
+                    </form>
+                </nav>
             </div>
         </div>
     </nav>

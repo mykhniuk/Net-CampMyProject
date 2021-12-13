@@ -25,10 +25,23 @@ namespace Net_CampMyProject.Services
                 .FirstOrDefaultAsync(m => m.Id == id); ;
         }
 
-        public async Task<MyFilmRating> CreateOrUpdateAsync(MyFilmRating myFilmRating)
+        public async Task CreateOrUpdateAsync(MyFilmRating newFilmRating)
         {
-            return await GetAll().FirstOrDefaultAsync(mr =>
-                mr.FilmId == myFilmRating.FilmId && mr.AuthorId == myFilmRating.AuthorId);
+            var target = await GetAll().FirstOrDefaultAsync(mr => mr.FilmId == newFilmRating.FilmId && 
+                                                                    mr.AuthorId == newFilmRating.AuthorId);
+            
+            if (target != null)
+            {
+                if(target.MyRating != newFilmRating.MyRating)
+                {
+                    target.MyRating = newFilmRating.MyRating;
+                    await UpdateAsync(target);
+                }
+            }
+            else
+            {
+                await CreateAsync(newFilmRating);
+            }
         }
     }
 }

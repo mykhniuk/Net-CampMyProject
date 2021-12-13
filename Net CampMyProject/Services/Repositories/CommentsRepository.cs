@@ -21,7 +21,8 @@ namespace Net_CampMyProject.Services
 
         public override async Task<Comment> GetByIdAsync(int id)
         {
-            return await GetAll().AsSplitQuery()
+            return await GetAll()
+                .AsSplitQuery()
                 .Include(c => c.Author)
                 .Include(c => c.Film)
                 .FirstOrDefaultAsync(m => m.Id == id);
