@@ -9,6 +9,7 @@ using Net_CampMyProject.Services.Interfaces;
 
 namespace Net_CampMyProject.Controllers
 {
+    [Authorize(Roles = Roles.Admin)]
     public class MyFilmRatingsController : BaseController<MyFilmRating>
     {
         private readonly IMyRatingsRepository _myRatingsRepository;
@@ -29,11 +30,15 @@ namespace Net_CampMyProject.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateOrUpdate(MyFilmRating myFilmRating)
         {
-            myFilmRating.AuthorId = _userManager.GetUserId(User);
+            var authorId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(authorId))
+                return RedirectToAction(nameof(Details), "Films", new { id = myFilmRating?.FilmId });
+
+            myFilmRating.AuthorId = authorId;
 
             await _myRatingsRepository.CreateOrUpdateAsync(myFilmRating);
 

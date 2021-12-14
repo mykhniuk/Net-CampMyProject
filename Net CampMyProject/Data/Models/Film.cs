@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Net_CampMyProject.Data.Models
 {
@@ -13,6 +14,7 @@ namespace Net_CampMyProject.Data.Models
 
         public string Duration { get; set; }
 
+        [DisplayName("Trailer")]
         public string TrailerUrl { get; set; }
 
         public string Story { get; set; }
@@ -21,14 +23,16 @@ namespace Net_CampMyProject.Data.Models
 
         public string Description { get; set; }
 
+        [DisplayName("Release date")]
         public DateTime ReleaseDate { get; set; }
 
         public string Budget { get; set; }
 
         public string Languages { get; set; }
 
-        public string Awards { get; set; }       
+        public string Awards { get; set; }
 
+        [DisplayName("Box office")]
         public string BoxOffice { get; set; }
 
         public string Nominations { get; set; }

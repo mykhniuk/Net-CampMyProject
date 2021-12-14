@@ -1,14 +1,32 @@
 ﻿@using Net_CampMyProject.Data.Models
 @using Net_CampMyProject.Controllers
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.CodeAnalysis.Differencing
 @model Net_CampMyProject.Data.Models.Film
+
+@inject UserManager<IdentityUser> _userManager;
 
 @{
     ViewData["Title"] = "Details";
     var isAdmin = User.IsInRole(Roles.Admin);
-    var u = Model.MyRatings.Where(c => c.MyRating == true).Count();
-    var y = Model.MyRatings.Count();
-    var p = (u*1.0 / y) * 100;
-    var p1 = 100 - p;
+    var userId = _userManager.GetUserId(User);
+
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+
+    var likesCount = Model.MyRatings.Count(c => c.MyRating);
+    var dislikesCount = Model.MyRatings.Count(c => !c.MyRating);
+    var votesCount = Model.MyRatings.Count;
+
+    var likesPercent = likesCount * 1.0 / votesCount * 100;
+    var dislikesPercent = 100 - likesPercent;
+}
+
+@if (isAdmin)
+{
+    <div>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        <a asp-action="Index">Back to List</a>
+    </div>
 }
 
 <div>
@@ -27,35 +45,29 @@
                 @Html.DisplayFor(model => model.Id)
             </dd>
         }
-        @if (isAdmin)
-        {
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Title)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Title)
-            </dd>
-        }
-        @if (Model.ImgUrl != null)
+
+        @if (!string.IsNullOrEmpty(Model.ImgUrl))
         {
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.ImgUrl)
             </dt>
 
             <dd class="col-sm-10">
-                <img src="@Model.ImgUrl" />
+                <img src="@Model.ImgUrl" alt="@Model.Title" />
             </dd>
         }
+
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Genres)
         </dt>
         <dd class="col-sm-10">
             @foreach (var item in Model.Genres)
             {
-                <span> @item.Genre.GenreType ||</span>
+                <span>@item.Genre.GenreType </span>
             }
         </dd>
-        @if (Model.Duration != null)
+
+        @if (!string.IsNullOrEmpty(Model.Duration))
         {
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Duration)
@@ -64,7 +76,8 @@
                 @Model.Duration
             </dd>
         }
-        @if (Model.TrailerUrl != null)
+
+        @if (!string.IsNullOrEmpty(Model.TrailerUrl))
         {
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.TrailerUrl)
@@ -73,6 +86,7 @@
                 <iframe width="560" height="315" src="@Model.TrailerUrl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </dd>
         }
+
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
@@ -85,7 +99,8 @@
         <dd class="col-sm-10">
             @Model.ReleaseDate.ToShortDateString()
         </dd>
-        @if (Model.Languages != null)
+
+        @if (!string.IsNullOrEmpty(Model.Budget))
         {
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Budget)
@@ -95,7 +110,7 @@
             </dd>
         }
 
-        @if (Model.Languages != null)
+        @if (!string.IsNullOrEmpty(Model.Languages))
         {
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Languages)
@@ -105,7 +120,7 @@
             </dd>
         }
 
-        @if (Model.Awards != null)
+        @if (!string.IsNullOrEmpty(Model.Awards))
         {
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Awards)
@@ -115,7 +130,7 @@
             </dd>
         }
 
-        @if (Model.BoxOffice != null)
+        @if (!string.IsNullOrEmpty(Model.BoxOffice))
         {
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.BoxOffice)
@@ -125,7 +140,7 @@
             </dd>
         }
 
-        @if (Model.Nominations != null)
+        @if (!string.IsNullOrEmpty(Model.Nominations))
         {
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Nominations)
@@ -135,10 +150,10 @@
             </dd>
         }
 
-        @if (Model.Persons.Where(c => c.Role == FilmPersonRole.Director).FirstOrDefault() != null)
+        @if (Model.Persons.Any(c => c.Role == FilmPersonRole.Director))
         {
             <dt class="col-sm-2">
-                @nameof(FilmPersonRole.Director)
+                Directors
             </dt>
 
             <dd class="col-sm-10">
@@ -149,10 +164,10 @@
             </dd>
         }
 
-        @if (Model.Persons.Where(c => c.Role == FilmPersonRole.Producer).FirstOrDefault() != null)
+        @if (Model.Persons.Any(c => c.Role == FilmPersonRole.Producer))
         {
             <dt class="col-sm-2">
-                @nameof(FilmPersonRole.Producer)
+                Producers
             </dt>
             <dd class="col-sm-10">
                 @foreach (var i in Model.Persons.Where(c => c.Role == FilmPersonRole.Producer))
@@ -162,10 +177,10 @@
             </dd>
         }
 
-        @if (Model.Persons.Where(c => c.Role == FilmPersonRole.ExecutiveProducers).FirstOrDefault() != null)
+        @if (Model.Persons.Any(c => c.Role == FilmPersonRole.ExecutiveProducers))
         {
             <dt class="col-sm-2">
-                @nameof(FilmPersonRole.ExecutiveProducers)
+                Executive producers
             </dt>
             <dd class="col-sm-10">
                 @foreach (var i in Model.Persons.Where(c => c.Role == FilmPersonRole.ExecutiveProducers))
@@ -175,10 +190,10 @@
             </dd>
         }
 
-        @if (Model.Persons.Where(c => c.Role == FilmPersonRole.Composer).FirstOrDefault() != null)
+        @if (Model.Persons.Any(c => c.Role == FilmPersonRole.Composer))
         {
             <dt class="col-sm-2">
-                @nameof(FilmPersonRole.Composer)
+                Composers
             </dt>
             <dd class="col-sm-10">
                 @foreach (var i in Model.Persons.Where(c => c.Role == FilmPersonRole.Composer))
@@ -188,10 +203,10 @@
             </dd>
         }
 
-        @if (Model.Persons.Where(c => c.Role == FilmPersonRole.Screenplay).FirstOrDefault() != null)
+        @if (Model.Persons.Any(c => c.Role == FilmPersonRole.Screenplay))
         {
             <dt class="col-sm-2">
-                @nameof(FilmPersonRole.Screenplay)
+                Screenplays
             </dt>
             <dd class="col-sm-10">
                 @foreach (var i in Model.Persons.Where(c => c.Role == FilmPersonRole.Screenplay))
@@ -201,10 +216,10 @@
             </dd>
         }
 
-        @if (Model.Persons.Where(c => c.Role == FilmPersonRole.StoryBy).FirstOrDefault() != null)
+        @if (Model.Persons.Any(c => c.Role == FilmPersonRole.StoryBy))
         {
             <dt class="col-sm-2">
-                @nameof(FilmPersonRole.StoryBy)
+                Story by
             </dt>
             <dd class="col-sm-10">
                 @foreach (var i in Model.Persons.Where(c => c.Role == FilmPersonRole.StoryBy))
@@ -214,10 +229,10 @@
             </dd>
         }
 
-        @if (Model.Persons.Where(c => c.Role == FilmPersonRole.Cast).FirstOrDefault() != null)
+        @if (Model.Persons.FirstOrDefault(c => c.Role == FilmPersonRole.Cast) != null)
         {
             <dt class="col-sm-2">
-                @nameof(FilmPersonRole.Cast)
+                Cast
             </dt>
             <dd class="col-sm-10">
                 @foreach (var i in Model.Persons.Where(c => c.Role == FilmPersonRole.Cast))
@@ -226,7 +241,8 @@
                 }
             </dd>
         }
-        @if (Model.Ratings.FirstOrDefault() != null)
+
+        @if (Model.Ratings.Any())
         {
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Ratings)
@@ -236,12 +252,12 @@
                 {
                     <div>
                         <a href="@source.Source.ResourceWebsite">@source.Rating.Trim().Split(" ").FirstOrDefault().Trim()</a>
-
                     </div>
                 }
             </dd>
         }
-        @if (Model.Story != null)
+
+        @if (!string.IsNullOrEmpty(Model.Story))
         {
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Story)
@@ -250,85 +266,95 @@
                 @Model.Story
             </dd>
         }
+
     </dl>
 
-    <div>
-        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-        <a asp-action="Index">Back to List</a>
-    </div>
-
-
-    <h4>My Rating:</h4>
+    <h4>Likes / dislikes:</h4>
     <div class="row">
         <div class="col-md-4">
             <form asp-action="CreateOrUpdate" asp-controller="MyFilmRatings">
 
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                <input hidden="hidden" name="@nameof(MyFilmRating.FilmId)" value="@Model.Id" class="form-control"/>
+                <input hidden="hidden" name="@nameof(MyFilmRating.FilmId)" value="@Model.Id" class="form-control" />
 
                 <div class="form-group form-check">
                     <div class="form-group">
 
                         @{
-                            var likesCount = Model.MyRatings.Count(c => c.MyRating);
-                            var dislikesCount = Model.MyRatings.Count(c => !c.MyRating);
+                            var disabledStr = isAuthenticated ? "" : "disabled";
                         }
 
-                        <button class="btn btn-success btn-lg" name="@nameof(MyFilmRating.MyRating)" value="true" title="Likes">@likesCount</button> :
-                        <button class="btn btn-danger btn-lg" name="@nameof(MyFilmRating.MyRating)" value="false" title="Dislikes">@dislikesCount</button>
+                        <button @disabledStr class="btn btn-success btn-lg" name="@nameof(MyFilmRating.MyRating)" value="true" title="Likes">@likesCount</button> :
+                        <button @disabledStr class="btn btn-danger btn-lg" name="@nameof(MyFilmRating.MyRating)" value="false" title="Dislikes">@dislikesCount</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
-    @if (double.IsNaN(p) == false)
+
+    @if (!double.IsNaN(likesPercent))
     {
         <div class="progress bg-danger">
-            <div class="progress-bar bg-success" role="progressbar" style="width:@p%" aria-valuenow="@p" aria-valuemin="0" aria-valuemax="100">@Math.Round(p, 1)%</div>
-            <div class="progress-bar bg-danger" role="progressbar" style="width:@p1%">@Math.Round(p1, 1)%</div>
+            <div class="progress-bar bg-success" role="progressbar" style="width:@likesPercent%" aria-valuenow="@likesPercent" aria-valuemin="0" aria-valuemax="100">@Math.Round(likesPercent, 1)%</div>
+            <div class="progress-bar bg-danger" role="progressbar" style="width:@dislikesPercent%">@Math.Round(dislikesPercent, 1)%</div>
         </div>
     }
-
-    <h4>Add Comment:</h4>
-
-    <div class="form-group">
-        <form asp-action="Create" asp-controller="Comments">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input hidden="hidden" name="@nameof(Comment.FilmId)" value="@Model.Id" class="form-control" />
-
-            <div class="form-group">
-                <textarea class="form-control" name="@nameof(Comment.Content)" rows="3" placeholder="Write your comment"></textarea>
-            </div>
-
-            <div class="form-group text-right">
-                <input type="submit" value="Add comment" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-    @if (Model.Comments.Count != 0)
+    
+    @if (isAuthenticated)
     {
-        <h2>Comments(@Model.Comments.Count)</h2>
+        <div class="form-group my-3">
+
+            <h4>Add comment:</h4>
+
+            <form asp-action="Create" asp-controller="Comments">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input hidden="hidden" name="@nameof(Comment.FilmId)" value="@Model.Id" class="form-control" />
+
+                <div class="form-group">
+                    <textarea class="form-control" name="@nameof(Comment.Content)" rows="3" placeholder="Write your comment"></textarea>
+                </div>
+
+                <div class="form-group text-right">
+                    <input type="submit" value="Add comment" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
     }
+    else
+    {
+        <h4 class="my-5 text-danger">Add comment form is not available. <a asp-area="Identity" asp-page="/Account/Login">Authorize</a> first!</h4>
+    }
+
+    @if (Model.Comments.Any())
+    {
+        <h2>Comments count @Model.Comments.Count</h2>
+    }
+
     @foreach (var item in Model.Comments.OrderByDescending(c => c.DateTime).Take(10))
     {
+        var isMyVote = userId == item.AuthorId;
+
         <div class="shadow-lg p-3 mb-2 bg-white rounded">
             <div class="row mx-md-n5">
                 <div class="col px-md-5">
                     <div class="p-3 border bg-light">
                         <div class="media-body">
-                            <h4> @Html.DisplayFor(modelItem => item.Author.UserName) </h4>
-                            <p> @Html.DisplayFor(modelItem => item.Content)</p>
+                            <h4>@Html.DisplayFor(modelItem => item.Author.UserName) </h4>
+                            <p>@Html.DisplayFor(modelItem => item.Content)</p>
                         </div>
-                        <div class="text-right"><small><i>Posted on  @Html.DisplayFor(modelItem => item.DateTime)</i></small></div>
+                        <div class="text-right">
+                            <small>
+                                <i>@Html.DisplayFor(modelItem => item.DateTime)</i>
+                            </small>
+                        </div>
                         <div>
-                            @if (User.Identity.Name == item.Author.UserName | isAdmin)
+                            @if (isMyVote || isAdmin)
                             {
-                                <a asp-controller="Comments" asp-action="Edit" asp-route-id="@item.Id">Edit |</a>
+                                <a asp-controller="Comments" asp-action="Edit" asp-route-id="@item.Id">Edit</a> <span> | </span>
                                 <a asp-controller="Comments" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                             }
                         </div>
-
                     </div>
                 </div>
             </div>

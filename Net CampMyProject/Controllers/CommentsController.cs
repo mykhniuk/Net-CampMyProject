@@ -56,6 +56,7 @@ namespace Net_CampMyProject.Controllers
             return RedirectToAction(nameof(Details), "Films", new { id = comment?.FilmId });
         }
 
+        [Authorize]
         public override async Task<IActionResult> Edit(int id)
         {
             var isAdmin = User.IsInRole(Roles.Admin);
@@ -71,6 +72,7 @@ namespace Net_CampMyProject.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public override async Task<IActionResult> Edit(int id, Comment entity)
         {
@@ -91,6 +93,7 @@ namespace Net_CampMyProject.Controllers
             return RedirectToAction(nameof(Details), "Films", new {id = comment.FilmId});
         }
 
+        [Authorize]
         public override async Task<IActionResult> Delete(int id)
         {
             var isAdmin = User.IsInRole(Roles.Admin);
@@ -105,6 +108,7 @@ namespace Net_CampMyProject.Controllers
             return await base.Delete(id);
         }
 
+        [Authorize]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public override async Task<IActionResult> DeleteConfirmed(int id)
