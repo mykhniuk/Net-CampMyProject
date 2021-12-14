@@ -1,0 +1,45 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<Net_CampMyProject.Data.Models.Comment>
+@inject UserManager<IdentityUser> _userManager
+
+@{
+    var isAdmin = User.IsInRole(Roles.Admin);
+    var userId = _userManager.GetUserId(User);
+
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+}
+
+@if (Model.Any())
+{
+    <h2>Comments count @Model.Count()</h2>
+}
+
+@foreach (var item in Model.OrderByDescending(c => c.DateTime).Take(10))
+{
+    var isMyVote = userId == item.AuthorId;
+
+    <div class="shadow-lg p-3 mb-2 bg-white rounded">
+        <div class="row mx-md-n5">
+            <div class="col px-md-5">
+                <div class="p-3 border bg-light">
+                    <div class="media-body">
+                        <h4>@Html.DisplayFor(modelItem => item.Author.UserName) </h4>
+                        <p>@Html.DisplayFor(modelItem => item.Content)</p>
+                    </div>
+                    <div class="text-right">
+                        <small>
+                            <i>@Html.DisplayFor(modelItem => item.DateTime)</i>
+                        </small>
+                    </div>
+                    <div>
+                        @if (isMyVote || isAdmin)
+                        {
+                            <a asp-controller="Comments" asp-action="Edit" asp-route-id="@item.Id">Edit</a> <span> | </span>
+                            <a asp-controller="Comments" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

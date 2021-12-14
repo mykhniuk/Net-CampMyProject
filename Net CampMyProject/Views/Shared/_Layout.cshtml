@@ -13,50 +13,50 @@
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light  bg-dark text-white border-bottom box-shadow mb-3">
-        <div class="container">
-            <a class="navbar-brand text-white" asp-area="" asp-controller="Films" asp-action="Index">WMT</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light  bg-dark text-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand text-white" asp-area="" asp-controller="Films" asp-action="Index">WMT</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 
-                <ul class="navbar-nav flex-grow-1">
-                    @if (User.Identity.Name != null)
-                    {
+                    <ul class="navbar-nav flex-grow-1">
+                        @if (User.Identity.Name != null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white-50" asp-controller="Films" asp-action="List" asp-route-filter="Liked">My liked films</a>
+                            </li>
+                        }
                         <li class="nav-item">
-                            <a class="nav-link text-white-50" asp-controller="Films" asp-action="List" asp-route-filter="Liked">My liked films</a>
+                            <a class="nav-link text-white-50" asp-controller="News" asp-action="Index">News</a>
                         </li>
-                    }
-                    <li class="nav-item">
-                        <a class="nav-link text-white-50" asp-controller="News" asp-action="Index">News</a>
-                    </li>
-                </ul>
-                <nav class="navbar navbar-light bg-dark">
-                    <form class="form-inline" asp-controller="Films" asp-action="List">
-                        <input class="form-control mr-sm-2" type="text" name="keyword" placeholder="Search" aria-label="Search">
-                        <button class="btn btn-outline-light text-white-50" type="submit">Search</button>
-                    </form>
-                </nav>
+                    </ul>
+                    <nav class="navbar navbar-light bg-dark">
+                        <form class="form-inline" asp-controller="Films" asp-action="List">
+                            <input class="form-control mr-sm-2" type="text" name="keyword" placeholder="Search" aria-label="Search">
+                            <button class="btn btn-outline-light text-white-50" type="submit">Search</button>
+                        </form>
+                    </nav>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9">
+                @RenderBody()
+            </div>
+            <div class="col-md-3">
+                @await Component.InvokeAsync("RightPanel")
             </div>
         </div>
-    </nav>
-</header>
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-9">
-            @RenderBody()
-        </div>
-        <div class="col-md-3">
-            @await Component.InvokeAsync("RightPanel")
-        </div>
     </div>
-</div>
 
-<footer class="border-top footer text-muted">
+    <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2021 - WATCHMOVIE.TODAY - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
@@ -64,6 +64,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    @Html.RenderUnobtrusiveAjaxScript()
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

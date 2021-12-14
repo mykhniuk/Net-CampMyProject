@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Net_CampMyProject.Data;
 using Net_CampMyProject.Data.Models;
@@ -17,6 +18,15 @@ namespace Net_CampMyProject.Services
         public async Task<List<Comment>> GetAllCommentsListAsync()
         {
             return await GetAll().Include(c => c.Author).Include(c => c.Film).ToListAsync();
+        }
+
+        public async Task<List<Comment>> GetByFilmIdAsync(int id)
+        {
+            return await GetAll()
+                .AsSplitQuery()
+                .Include(c => c.Author)
+                .Where(m => m.FilmId == id)
+                .ToListAsync();
         }
 
         public override async Task<Comment> GetByIdAsync(int id)

@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using AspNetCore.Unobtrusive.Ajax;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,16 +12,17 @@ using Net_CampMyProject.Services.Interfaces;
 
 namespace Net_CampMyProject.Controllers
 {
-    [Authorize(Roles = Roles.Admin)]
     public class FilmsController : BaseController<Film>
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IFilmsRepository _filmsRepository;
+        private readonly ICommentsRepository _commentsRepository;
 
-        public FilmsController(UserManager<IdentityUser> userManager, IFilmsRepository filmsRepository) : base(filmsRepository)
+        public FilmsController(UserManager<IdentityUser> userManager, IFilmsRepository filmsRepository, ICommentsRepository commentsRepository) : base(filmsRepository)
         {
             _userManager = userManager;
             _filmsRepository = filmsRepository;
+            _commentsRepository = commentsRepository;
         }
 
         // GET: Films
@@ -63,6 +66,29 @@ namespace Net_CampMyProject.Controllers
         public override Task<IActionResult> Details(int id)
         {
             return base.Details(id);
+        }
+
+        [AjaxOnly]
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddComment(Comment comment)
+        {
+            comment.AuthorId = _userManager.GetUserId(User);
+            comment.DateTime = DateTime.Now;
+
+            await _commentsRepository.CreateAsync(comment);
+
+            return RedirectToAction("VotesList", new  { id = comment.FilmId});
+        }
+
+        public async Task<ActionResult> VotesList(int id)
+        {
+            var comments = await _commentsRepository.GetByFilmIdAsync(id);
+            if (comments == null)
+                return NotFound();
+
+            return PartialView("_VotesList", comments);
         }
     }
 }

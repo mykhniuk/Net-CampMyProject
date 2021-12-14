@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AspNetCore.Unobtrusive.Ajax;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Net_CampMyProject.Data;
@@ -118,6 +120,5 @@ namespace Net_CampMyProject.Controllers.API
             return _context.Films.Any(e => e.Id == id);
         }
 
-        
     }
 }

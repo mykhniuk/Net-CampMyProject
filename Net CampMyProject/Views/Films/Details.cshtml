@@ -300,15 +300,24 @@
             <div class="progress-bar bg-danger" role="progressbar" style="width:@dislikesPercent%">@Math.Round(dislikesPercent, 1)%</div>
         </div>
     }
-    
+
     @if (isAuthenticated)
     {
         <div class="form-group my-3">
 
             <h4>Add comment:</h4>
 
-            <form asp-action="Create" asp-controller="Comments">
+            <form asp-action="AddComment"
+                  asp-controller="Films"
+                  data-ajax="true"
+                  data-ajax-method="POST"
+                  data-ajax-mode="replace"
+                  data-ajax-update="#votesDiv"
+                  data-ajax-complete="onAddVoteComplete">
+
+                @Html.AntiForgeryToken()
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
                 <input hidden="hidden" name="@nameof(Comment.FilmId)" value="@Model.Id" class="form-control" />
 
                 <div class="form-group">
@@ -318,6 +327,7 @@
                 <div class="form-group text-right">
                     <input type="submit" value="Add comment" class="btn btn-primary" />
                 </div>
+
             </form>
         </div>
     }
@@ -326,38 +336,19 @@
         <h4 class="my-5 text-danger">Add comment form is not available. <a asp-area="Identity" asp-page="/Account/Login">Authorize</a> first!</h4>
     }
 
-    @if (Model.Comments.Any())
-    {
-        <h2>Comments count @Model.Comments.Count</h2>
-    }
+    <div id="votesDiv">
+        @await Html.PartialAsync("_VotesList", Model.Comments)
+    </div>
 
-    @foreach (var item in Model.Comments.OrderByDescending(c => c.DateTime).Take(10))
-    {
-        var isMyVote = userId == item.AuthorId;
-
-        <div class="shadow-lg p-3 mb-2 bg-white rounded">
-            <div class="row mx-md-n5">
-                <div class="col px-md-5">
-                    <div class="p-3 border bg-light">
-                        <div class="media-body">
-                            <h4>@Html.DisplayFor(modelItem => item.Author.UserName) </h4>
-                            <p>@Html.DisplayFor(modelItem => item.Content)</p>
-                        </div>
-                        <div class="text-right">
-                            <small>
-                                <i>@Html.DisplayFor(modelItem => item.DateTime)</i>
-                            </small>
-                        </div>
-                        <div>
-                            @if (isMyVote || isAdmin)
-                            {
-                                <a asp-controller="Comments" asp-action="Edit" asp-route-id="@item.Id">Edit</a> <span> | </span>
-                                <a asp-controller="Comments" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
 </div>
+
+@section Scripts  {
+
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    
+    <script>
+        function onAddVoteComplete() {
+            $("textarea[name='Content']").val('');
+        };
+    </script>
+}
