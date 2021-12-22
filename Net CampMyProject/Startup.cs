@@ -9,7 +9,6 @@ using Net_CampMyProject.Data;
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Net_CampMyProject.Models;
 using Net_CampMyProject.Services;

@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Views\Shared\Components\RightPanel\Default1.cshtml" />
+    <Content Remove="Views\Shared\Components\RightPanel\Default.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Views\Shared\Components\RightPanel\Default1.cshtml" />
+    <None Include="Views\Shared\Components\RightPanel\Default.cshtml" />
   </ItemGroup>
 
 </Project>

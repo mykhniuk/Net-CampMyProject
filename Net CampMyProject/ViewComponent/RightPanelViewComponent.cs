@@ -43,7 +43,7 @@ namespace Net_CampMyProject.ViewComponent
                 newTopFilm.Film = film;
                 topFilms.Add(newTopFilm);
             }
-            return View("Default1", topFilms.OrderByDescending(t=>t.Rating).Take(10));
+            return View("Default", topFilms.OrderByDescending(t=>t.Rating).Take(10));
         }
     }
 }
